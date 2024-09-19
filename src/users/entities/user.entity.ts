@@ -1,18 +1,19 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Column, CreateDateColumn, DeleteDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { v4 as uuidv4 } from 'uuid';
 
 @Entity({ name: 'Users' })
 export class User {
-    @PrimaryGeneratedColumn()
-    id: number;
+    @PrimaryGeneratedColumn('uuid')
+    id: string;
 
     @Column()
     name: string;
 
     @Column()
-    lastName: string;
+    last_name: string;
 
     @Column()
-    phoneNumber: string;
+    phone_number: string;
 
     @Column()
     apartment: string;
@@ -21,8 +22,17 @@ export class User {
     email: string;
 
     @Column()
-    username: string;
+    user_name: string;
 
     @Column()
     password: string;
+
+    @CreateDateColumn()
+    created_at: Date;
+
+    @UpdateDateColumn()
+    updated_at: Date;
+
+    @DeleteDateColumn()
+    deleted_at: Date;
 }

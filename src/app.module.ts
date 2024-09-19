@@ -3,11 +3,13 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { UsersModule } from './users/users.module';
 import { DataSource } from 'typeorm';
 
 
 @Module({
   imports: [
+    UsersModule,
     ConfigModule.forRoot({
       envFilePath: 'deploy/.env',
     }),
@@ -17,11 +19,11 @@ import { DataSource } from 'typeorm';
       port: parseInt(process.env.DB_PORT),
       username: process.env.DB_USER,
       password: process.env.DB_PASSWORD,
-      database: process.env.DB_DATABASE,
+      database: process.env.DB_NAME,
       autoLoadEntities: true,
       synchronize: true,
   
-    })
+    }),
 
 ],
   controllers: [AppController],
@@ -29,6 +31,11 @@ import { DataSource } from 'typeorm';
 })
 
 
-export class AppModule {}
+export class AppModule {
+  constructor(private dataSource: DataSource) {
+    console.log(`Host de la base de datos: ${process.env.DB_HOST}`);
+  }
+}
+
 
 

@@ -17,5 +17,4 @@ import { JwtModule } from '@nestjs/jwt';
 })
 export class AuthModule {
   constructor() {}
-
 }

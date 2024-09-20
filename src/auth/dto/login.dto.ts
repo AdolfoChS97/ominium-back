@@ -1,15 +1,7 @@
-import { IsString, MinLength } from "class-validator";
-import { Transform } from "class-transformer";
+import { PickType } from '@nestjs/swagger';
+import { User } from 'src/users/entities/user.entity';
 
-export class LoginDto {
-    
-    @Transform(({value}) => value.trim())
-    @IsString()
-    @MinLength(6)
-    user_name: string
-
-    @Transform(({value}) => value.trim())
-    @IsString()
-    @MinLength(6)
-    password: string
-}
+export class LoginDto extends PickType(User, [
+  'password',
+  'user_name',
+] as const) {}

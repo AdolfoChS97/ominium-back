@@ -88,6 +88,9 @@ export class UsersService {
     if(!user){
       throw new BadRequestException('user not found');
     }else{
+
+
+      updateUserDto.password = await bcryptjs.hash(updateUserDto.password, 10);
       return this.usersRepository.save({ ...user, ...updateUserDto });
     }
   }

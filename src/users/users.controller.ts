@@ -15,7 +15,7 @@ import { ApiTags } from '@nestjs/swagger';
 @ApiTags('users')
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(private readonly usersService: UsersService) { }
 
   @Post()
   create(@Body() createUserDto: CreateUserDto) {
@@ -27,23 +27,24 @@ export class UsersController {
     return this.usersService.findAll();
   }
 
-  @Get(':id')
+
+  @Get('/:id')
   findOne(@Param('id') id: string) {
-    return this.usersService.findOne(+id);
+    return this.usersService.findOne(id);
   }
 
-  @Get(':username')
-  findOneByUserName(@Param('username') username: string) {
-    return this.usersService.findOneByUserName(username);
+  @Get('/byUsername/:user_name')
+  findOneByUserName(@Param('user_name') user_name: string) {
+    return this.usersService.findOneByUserName(user_name);
   }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(+id, updateUserDto);
+    return this.usersService.update(id, updateUserDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.usersService.remove(+id);
+    return this.usersService.remove(id);
   }
 }

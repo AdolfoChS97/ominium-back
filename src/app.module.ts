@@ -25,22 +25,14 @@ const configService = new ConfigService();
       database: configService.get('DB_NAME'),
       autoLoadEntities: true,
       synchronize: true,
-  
     }),
     AuthModule,
-
-],
+  ],
   controllers: [AppController],
   providers: [AppService],
 })
-
-
 export class AppModule {
   constructor(private dataSource: DataSource) {
     console.log(`Host de la base de datos: ${process.env.DB_HOST}`);
   }
-  
 }
-
-
-

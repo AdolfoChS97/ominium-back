@@ -16,11 +16,9 @@ export class User {
     phone_number: string;
 
     @Column()
-    apartment: string;
-
-    @Column()
     email: string;
 
+    
     @Column()
     user_name: string;
 

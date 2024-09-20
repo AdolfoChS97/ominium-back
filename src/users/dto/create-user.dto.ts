@@ -11,9 +11,6 @@ export class CreateUserDto {
     phone_number: string
 
     @IsString()
-    apartment: string
-
-    @IsString()
     email: string
 
     @IsString()

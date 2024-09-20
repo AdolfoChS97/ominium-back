@@ -1,3 +1,5 @@
+import { Transform } from 'class-transformer';
+import { IsEmail, IsString, MinLength } from 'class-validator';
 import {
   Column,
   CreateDateColumn,
@@ -12,21 +14,34 @@ export class User {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
+  @IsString()
+  @Transform(({ value }) => value.trim())
   @Column()
   name: string;
 
+  @IsString()
+  @Transform(({ value }) => value.trim())
   @Column()
   last_name: string;
 
+  @IsString()
+  @Transform(({ value }) => value.trim())
   @Column()
   phone_number: string;
 
+  @IsEmail()
   @Column()
   email: string;
 
+  @IsString()
+  @MinLength(6)
+  @Transform(({ value }) => value.trim())
   @Column()
   user_name: string;
 
+  @IsString()
+  @MinLength(8)
+  @Transform(({ value }) => value.trim())
   @Column()
   password: string;
 

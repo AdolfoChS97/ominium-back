@@ -50,7 +50,7 @@ export class User {
   @IsString()
   @MinLength(8)
   @Transform(({ value }) => value.trim())
-  @Column({select: false, nullable: false})
+  @Column({ nullable: false})
   password: string;
 
   @CreateDateColumn()

@@ -7,6 +7,7 @@ import { Repository } from 'typeorm';
 import * as bcryptjs from 'bcryptjs';
 import { Not } from 'typeorm';
 import { FindManyOptions } from 'typeorm';
+import { PaginationQueryParamsDto } from 'src/shared/dtos/paginatio.dto';
 
 
 @Injectable()
@@ -37,17 +38,22 @@ export class UsersService {
 
   }
 
-  async findAll() {
-    const users = await this.usersRepository.find({
-      where: { deleted_at: null },
-      select: ['id' , 'user_name', 'name', 'last_name', 'phone_number', 'email'], 
-    } as FindManyOptions<User>);
-  
-    if (!users) {
-      throw new BadRequestException('users no registers');
+  async findAll({pageNumber, pageSize, sortOrder }: PaginationQueryParamsDto) {
+    try {
+      const data = await this .usersRepository.findAndCount({
+        skip: (pageNumber - 1) * pageSize,
+        take: pageSize,
+        order: {
+          created_at: sortOrder || 'DESC',
+        },
+      });
+      return {
+        data: data[0],
+        total: data[1],
+      };
+    } catch (error) {
+      throw error;
     }
-  
-    return users;
   }
 
 

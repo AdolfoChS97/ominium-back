@@ -57,6 +57,6 @@ export class AuthService {
       expiresIn: this.configService.get('JWT_TIME_EXPI'),
     });
 
-    return { token, user_name };
+    return { token };
   }
 }

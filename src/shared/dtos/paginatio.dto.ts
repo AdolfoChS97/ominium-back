@@ -22,7 +22,7 @@ export class PaginationQueryParamsDto {
     
     @IsOptional()
     @IsEnum(Order)
-    sortOrder?: Order;
+    sort?: Order;
 
 }
 

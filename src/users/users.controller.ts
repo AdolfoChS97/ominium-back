@@ -31,15 +31,15 @@ export class UsersController {
 @Get()
 @ApiQuery({ name: 'pageNumber', type: 'number', required: true, example: 1 })
 @ApiQuery({ name: 'pageSize', type: 'number', required: true, example: 10 })
-@ApiQuery({ name: 'sortOrder', type: 'string', required: false, enum: Order })
+@ApiQuery({ name: 'sort', type: 'string', required: false, enum: Order })
 async findAll(
-  @Query() { pageNumber, pageSize, sortOrder }: PaginationQueryParamsDto,
+  @Query() { pageNumber, pageSize, sort }: PaginationQueryParamsDto,
 ) {
   try {
     const data = await this.usersService.findAll({
       pageNumber: pageNumber,
       pageSize: pageSize,
-      sortOrder: sortOrder,
+      sort: sort,
     });
     return data;
  

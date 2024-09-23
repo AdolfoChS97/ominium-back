@@ -38,13 +38,13 @@ export class UsersService {
 
   }
 
-  async findAll({pageNumber, pageSize, sortOrder }: PaginationQueryParamsDto) {
+  async findAll({pageNumber, pageSize, sort }: PaginationQueryParamsDto) {
     try {
       const data = await this .usersRepository.findAndCount({
         skip: (pageNumber - 1) * pageSize,
         take: pageSize,
         order: {
-          created_at: sortOrder || 'DESC',
+          created_at: sort || 'DESC',
         },
       });
       return {

@@ -6,6 +6,8 @@ import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
 import * as bcryptjs from 'bcryptjs';
 import { Not } from 'typeorm';
+import { FindManyOptions } from 'typeorm';
+import { PaginationQueryParamsDto } from 'src/shared/dtos/paginatio.dto';
 
 @Injectable()
 export class UsersService {
@@ -39,20 +41,40 @@ export class UsersService {
     return this.usersRepository.save(createUserDto);
   }
 
-  async findAll() {
-    const users = await this.usersRepository.find({
-      where: { deleted_at: null },
-    });
-    if (!users) {
-      throw new BadRequestException('users no registers');
+  async findAll({ pageNumber, pageSize, sort }: PaginationQueryParamsDto) {
+    try {
+      const data = await this.usersRepository.findAndCount({
+        skip: (pageNumber - 1) * pageSize,
+        take: pageSize,
+        order: {
+          created_at: sort || 'DESC',
+        },
+      });
+      return {
+        data: data[0],
+        total: data[1],
+      };
+    } catch (error) {
+      throw error;
     }
-
-    return users;
   }
 
   async findOne(id: string) {
-    const user = await this.usersRepository.findOneBy({ id, deleted_at: null });
+    const condition: FindManyOptions<User>[] = [
+      { where: { id, deleted_at: null } },
+      {
+        select: [
+          'id',
+          'user_name',
+          'name',
+          'last_name',
+          'phone_number',
+          'email',
+        ],
+      },
+    ];
 
+    const user = await this.usersRepository.find(condition[0]);
     if (!user) {
       throw new BadRequestException('user not found');
     }

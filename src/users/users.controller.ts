@@ -6,11 +6,14 @@ import {
   Patch,
   Param,
   Delete,
+  Query,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiQuery, ApiTags } from '@nestjs/swagger';
+import { PaginationQueryParamsDto } from 'src/shared/dtos/paginatio.dto';
+import { Order } from 'src/shared/dtos/paginatio.dto';
 
 @ApiTags('users')
 @Controller('users')
@@ -23,8 +26,22 @@ export class UsersController {
   }
 
   @Get()
-  findAll() {
-    return this.usersService.findAll();
+  @ApiQuery({ name: 'pageNumber', type: 'number', required: true, example: 1 })
+  @ApiQuery({ name: 'pageSize', type: 'number', required: true, example: 10 })
+  @ApiQuery({ name: 'sort', type: 'string', required: false, enum: Order })
+  async findAll(
+    @Query() { pageNumber, pageSize, sort }: PaginationQueryParamsDto,
+  ) {
+    try {
+      const data = await this.usersService.findAll({
+        pageNumber: pageNumber,
+        pageSize: pageSize,
+        sort: sort,
+      });
+      return data;
+    } catch (e) {
+      throw e;
+    }
   }
 
   @Get('/:id')

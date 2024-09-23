@@ -6,6 +6,8 @@ import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
 import * as bcryptjs from 'bcryptjs';
 import { Not } from 'typeorm';
+import { FindManyOptions } from 'typeorm';
+
 
 @Injectable()
 export class UsersService {
@@ -36,26 +38,31 @@ export class UsersService {
   }
 
   async findAll() {
-
     const users = await this.usersRepository.find({
       where: { deleted_at: null },
-    })
-    if(!users){
+      select: ['id' , 'user_name', 'name', 'last_name', 'phone_number', 'email'], 
+    } as FindManyOptions<User>);
+  
+    if (!users) {
       throw new BadRequestException('users no registers');
     }
-
-    return users
+  
+    return users;
   }
 
 
   async findOne(id: string) {
+    const condition : FindManyOptions<User>[] = [
+      { where: { id, deleted_at: null } },
+      { select: ['id' , 'user_name', 'name', 'last_name', 'phone_number', 'email'] },
+    ];
 
-    const user = await this.usersRepository.findOneBy({ id, deleted_at: null });
-    
-    if(!user){
+    const user = await this.usersRepository.find(condition[0]);
+    if (!user) {
       throw new BadRequestException('user not found');
     }
-    return user
+    return user;
+    
   }
 
   

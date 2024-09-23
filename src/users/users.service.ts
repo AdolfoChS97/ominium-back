@@ -9,21 +9,37 @@ import { Not } from 'typeorm';
 import { FindManyOptions } from 'typeorm';
 import { PaginationQueryParamsDto } from 'src/shared/dtos/paginatio.dto';
 
-
 @Injectable()
 export class UsersService {
+  fields = {
+    id: true,
+    user_name: true,
+    name: true,
+    last_name: true,
+    phone_number: true,
+    email: true,
+    created_at: true,
+    updated_at: true,
+    deleted_at: true,
+  };
+
   constructor(
     @InjectRepository(User)
     private usersRepository: Repository<User>,
-  ) { }
+  ) {}
 
   async create(createUserDto: CreateUserDto) {
-
     const { user_name, email } = createUserDto;
 
-    const userNameExists = await this.usersRepository.findOneBy({ user_name, deleted_at: null });
+    const userNameExists = await this.usersRepository.findOneBy({
+      user_name,
+      deleted_at: null,
+    });
 
-    const emailExists = await this.usersRepository.findOneBy({ email, deleted_at: null });
+    const emailExists = await this.usersRepository.findOneBy({
+      email,
+      deleted_at: null,
+    });
 
     if (userNameExists) {
       throw new BadRequestException('user name already exists');
@@ -35,12 +51,12 @@ export class UsersService {
 
     createUserDto.password = await bcryptjs.hash(createUserDto.password, 10);
     return this.usersRepository.save(createUserDto);
-
   }
 
-  async findAll({pageNumber, pageSize, sort }: PaginationQueryParamsDto) {
+  async findAll({ pageNumber, pageSize, sort }: PaginationQueryParamsDto) {
     try {
-      const data = await this .usersRepository.findAndCount({
+      const data = await this.usersRepository.findAndCount({
+        select: this.fields,
         skip: (pageNumber - 1) * pageSize,
         take: pageSize,
         order: {
@@ -56,11 +72,12 @@ export class UsersService {
     }
   }
 
-
   async findOne(id: string) {
-    const condition : FindManyOptions<User>[] = [
+    const condition: FindManyOptions<User>[] = [
       { where: { id, deleted_at: null } },
-      { select: ['id' , 'user_name', 'name', 'last_name', 'phone_number', 'email'] },
+      {
+        select: this.fields,
+      },
     ];
 
     const user = await this.usersRepository.find(condition[0]);
@@ -68,12 +85,13 @@ export class UsersService {
       throw new BadRequestException('user not found');
     }
     return user;
-    
   }
 
-  
   findOneByUserName(username: string) {
-    return this.usersRepository.findOneBy({ user_name: username, deleted_at: null });
+    return this.usersRepository.findOneBy({
+      user_name: username,
+      deleted_at: null,
+    });
   }
 
   findOneByEmail(email: string) {
@@ -81,14 +99,21 @@ export class UsersService {
   }
 
   async update(id: string, updateUserDto: UpdateUserDto) {
-
     const { user_name, email } = updateUserDto;
 
     const user = await this.usersRepository.findOneBy({ id, deleted_at: null });
-    
-    const userNameExists = await this.usersRepository.findOneBy({ user_name, deleted_at: null , id: Not(id)});
 
-    const emailExists = await this.usersRepository.findOneBy({ email, deleted_at: null , id: Not(id)});
+    const userNameExists = await this.usersRepository.findOneBy({
+      user_name,
+      deleted_at: null,
+      id: Not(id),
+    });
+
+    const emailExists = await this.usersRepository.findOneBy({
+      email,
+      deleted_at: null,
+      id: Not(id),
+    });
 
     if (userNameExists) {
       throw new BadRequestException('user name already exists');
@@ -98,11 +123,9 @@ export class UsersService {
       throw new BadRequestException('email already exists');
     }
 
-    if(!user){
+    if (!user) {
       throw new BadRequestException('user not found');
-    }else{
-
-
+    } else {
       updateUserDto.password = await bcryptjs.hash(updateUserDto.password, 10);
       return this.usersRepository.save({ ...user, ...updateUserDto });
     }
@@ -110,7 +133,7 @@ export class UsersService {
 
   remove(id: string) {
     const user = this.usersRepository.findOneBy({ id, deleted_at: null });
-    if(!user){
+    if (!user) {
       throw new BadRequestException('user not found');
     }
     return this.usersRepository.save({ ...user, deleted_at: new Date() });

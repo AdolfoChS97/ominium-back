@@ -13,7 +13,7 @@ const configService = new ConfigService();
   imports: [
     UsersModule,
     ConfigModule.forRoot({
-      envFilePath: 'deploy/.env',
+      envFilePath: '.env',
       isGlobal: true,
     }),
     TypeOrmModule.forRoot({

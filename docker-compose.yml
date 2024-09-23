@@ -1,0 +1,54 @@
+version: '3'
+
+services:
+  backend: 
+    image: 'ominium-back'
+    container_name: 'ominium-backend'
+    build: 
+      context: .
+      dockerfile: '.docker/Dockerfile'
+    ports:
+      - 3000:3000
+    env_file:
+      - .env
+    volumes:
+      - ./:/app
+    networks:
+      - ingress
+  db:
+    container_name: 'ominium-db'
+    image: postgres:14.1-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    ports:
+      - '5432:5432'
+    expose:
+      - 5432
+    volumes: 
+      - db:/var/lib/postgresql/data
+      - ./scripts/init.sh:/docker-entrypoint-initdb.d/init.sh
+    networks:
+      ingress: 
+        ipv4_address: 20.5.0.5
+  mailhog:
+    image: mailhog/mailhog
+    container_name: mailhog
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+    networks:
+      - ingress
+
+volumes:
+  db:
+    driver: local
+
+networks:
+  ingress:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 20.5.0.0/16

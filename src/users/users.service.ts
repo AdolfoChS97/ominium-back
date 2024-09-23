@@ -11,6 +11,18 @@ import { PaginationQueryParamsDto } from 'src/shared/dtos/paginatio.dto';
 
 @Injectable()
 export class UsersService {
+  fields = {
+    id: true,
+    user_name: true,
+    name: true,
+    last_name: true,
+    phone_number: true,
+    email: true,
+    created_at: true,
+    updated_at: true,
+    deleted_at: true,
+  };
+
   constructor(
     @InjectRepository(User)
     private usersRepository: Repository<User>,
@@ -44,6 +56,7 @@ export class UsersService {
   async findAll({ pageNumber, pageSize, sort }: PaginationQueryParamsDto) {
     try {
       const data = await this.usersRepository.findAndCount({
+        select: this.fields,
         skip: (pageNumber - 1) * pageSize,
         take: pageSize,
         order: {
@@ -63,14 +76,7 @@ export class UsersService {
     const condition: FindManyOptions<User>[] = [
       { where: { id, deleted_at: null } },
       {
-        select: [
-          'id',
-          'user_name',
-          'name',
-          'last_name',
-          'phone_number',
-          'email',
-        ],
+        select: this.fields,
       },
     ];
 

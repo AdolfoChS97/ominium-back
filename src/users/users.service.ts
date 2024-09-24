@@ -2,13 +2,13 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from './entities/user.entity';
+import { User } from 'src/users/entities/user.entity';
 import { Repository } from 'typeorm';
 import * as bcryptjs from 'bcryptjs';
 import { Not } from 'typeorm';
-import { FindManyOptions } from 'typeorm';
 import { PaginationQueryParamsDto } from 'src/shared/dtos/paginatio.dto';
-import { last } from 'rxjs';
+import { Rol } from 'src/rol/entities/rol.entity';
+
 
 @Injectable()
 export class UsersService {
@@ -22,15 +22,20 @@ export class UsersService {
     created_at: true,
     updated_at: true,
     deleted_at: true,
+    rol: true,
   };
 
   constructor(
     @InjectRepository(User)
     private usersRepository: Repository<User>,
+
+    @InjectRepository(Rol)
+    private rolRepository: Repository<Rol>,
+    
   ) { }
 
   async create(createUserDto: CreateUserDto) {
-    const { user_name, email } = createUserDto;
+    const { user_name, email , rol } = createUserDto;
 
     const userNameExists = await this.usersRepository.findOneBy({
       user_name,
@@ -41,6 +46,16 @@ export class UsersService {
       email,
       deleted_at: null,
     });
+ 
+
+    const rolExists = await this.rolRepository.findOneBy({
+      id: rol,
+      deleted_at: null,
+    });
+
+    if (!rolExists) {
+      throw new BadRequestException('Rol not found');
+    }
 
     if (userNameExists) {
       throw new BadRequestException('user name already exists');
@@ -51,9 +66,10 @@ export class UsersService {
     }
 
     createUserDto.password = await bcryptjs.hash(createUserDto.password, 10);
+
     return {
       message: 'user created successfully',
-      data : this.usersRepository.save(createUserDto)
+      data : await this.usersRepository.save(createUserDto)
     };
   }
 
@@ -125,6 +141,16 @@ export class UsersService {
         id: Not(id),
       });
 
+
+      const rolExists = await this.rolRepository.findOneBy({
+        id: updateUserDto.rol,
+        deleted_at: null,
+      });
+
+      if (!rolExists) {
+        throw new BadRequestException('Rol not found');
+      }
+
       if (userNameExists) {
         throw new BadRequestException('user name already exists');
       }
@@ -148,7 +174,8 @@ export class UsersService {
             last_name: (await updatedUser).last_name,
             phone_number: (await updatedUser).phone_number,
             email: (await updatedUser).email,
-            user_name: (await updatedUser).user_name
+            user_name: (await updatedUser).user_name,
+            rol : (await updatedUser).rol
           }
            
           

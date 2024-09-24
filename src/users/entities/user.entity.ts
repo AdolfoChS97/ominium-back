@@ -1,14 +1,21 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
-import { IsEmail, IsString, MinLength } from 'class-validator';
+import { IsEmail, IsNumber, isNumber, IsString, MinLength } from 'class-validator';
+import { Rol } from 'src/rol/entities/rol.entity';
+
 import {
   Column,
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  JoinColumn,
+  ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
+  JoinColumnOptions,
+  SelectQueryBuilder
 } from 'typeorm';
+
 
 @Entity({ name: 'Users' })
 export class User {
@@ -56,12 +63,24 @@ export class User {
   @Column({ nullable: false })
   password: string;
 
+  @ApiProperty({ example: '1', description: 'User rol' })
+  @IsNumber()
+  @JoinColumn({ name: 'rol' })
+  @ManyToOne(() => Rol, (rol) => rol.user, {
+    eager: true,
+
+  })
+  rol: number;
+
+
   @CreateDateColumn()
   created_at: Date;
 
   @UpdateDateColumn()
   updated_at: Date;
 
-  @DeleteDateColumn()
+  @DeleteDateColumn( { nullable: true  , default: null } )
   deleted_at: Date;
+
+
 }

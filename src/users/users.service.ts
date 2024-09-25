@@ -35,7 +35,7 @@ export class UsersService {
   ) { }
 
   async create(createUserDto: CreateUserDto) {
-    const { user_name, email , rol } = createUserDto;
+    const { user_name, email ,rol} = createUserDto;
 
     const userNameExists = await this.usersRepository.findOneBy({
       user_name,

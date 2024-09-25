@@ -8,11 +8,14 @@ import * as bcryptjs from 'bcryptjs';
 import { Not } from 'typeorm';
 import { PaginationQueryParamsDto } from 'src/shared/dtos/paginatio.dto';
 import { Rol } from 'src/rol/entities/rol.entity';
+import { UserMapper } from './mappers';
 
 
 @Injectable()
 export class UsersService {
-  fields = {
+
+  public USER: number = 1;
+  public fields = {
     id: true,
     user_name: true,
     name: true,
@@ -22,7 +25,10 @@ export class UsersService {
     created_at: true,
     updated_at: true,
     deleted_at: true,
-    rol: true,
+    rol: {
+      id: true,
+      name: true
+    }
   };
 
   constructor(
@@ -34,79 +40,109 @@ export class UsersService {
     
   ) { }
 
+  async userNameOrEmailExists(
+    user_name: string, 
+    email: string, 
+    id: string = '',
+    itself: boolean = false
+  ) {
+    let query = this.usersRepository
+      .createQueryBuilder('user')
+      .select(['user.user_name', 'user.email'])
+      .where('user.user_name = :user_name', { user_name })
+      .andWhere('user.email = :email', { email });
+    
+    if (itself) {
+      query = query.andWhere('user.id != :id', { id });
+    }
+    
+    const previousRecord = await query.getOne();
+    return previousRecord;
+  }
+  
   async create(createUserDto: CreateUserDto) {
-    const { user_name, email ,rol} = createUserDto;
-
-    const userNameExists = await this.usersRepository.findOneBy({
-      user_name,
-      deleted_at: null,
-    });
-
-    const emailExists = await this.usersRepository.findOneBy({
-      email,
-      deleted_at: null,
-    });
- 
-
+    const { user_name, email, rol_id } = createUserDto;
+    
+    if(await this.userNameOrEmailExists(user_name, email) !== null) {
+      throw new BadRequestException('user name or email already exists');
+    }
+    
     const rolExists = await this.rolRepository.findOneBy({
-      id: rol,
+      id: rol_id,
       deleted_at: null,
     });
 
     if (!rolExists) {
       throw new BadRequestException('Rol not found');
     }
-
-    if (userNameExists) {
-      throw new BadRequestException('user name already exists');
-    }
-
-    if (emailExists) {
-      throw new BadRequestException('email already exists');
-    }
-
+    
     createUserDto.password = await bcryptjs.hash(createUserDto.password, 10);
 
     return {
       message: 'user created successfully',
-      data : await this.usersRepository.save(createUserDto)
+      data : UserMapper(await this.usersRepository.save({ ...createUserDto, rol: rol_id }))
     };
   }
 
   async findAll({ pageNumber, pageSize, sort }: PaginationQueryParamsDto) {
     try {
-      const data = await this.usersRepository.findAndCount({
-        where: { deleted_at: null },
-        select: this.fields,
-        skip: (pageNumber - 1) * pageSize,
-        take: pageSize,
-        order: {
-          created_at: sort || 'DESC',
-        },
-      });
+      const query = this.usersRepository
+        .createQueryBuilder('user')
+        .leftJoinAndSelect('user.rol', 'roles')
+        .select([
+          'user.id', 
+          'user.name',
+          'user.last_name',
+          'user.user_name', 
+          'user.email',
+          'user.created_at',
+          'user.updated_at',
+          'roles.id',
+          'roles.rol',
+        ])
+        .where('user.deleted_at IS NULL')
+        .orderBy('user.created_at', sort || 'DESC')
+        .skip((pageNumber - 1) * pageSize)
+        .take(pageSize);
+  
+      const [data, total] = await query.getManyAndCount();
+  
       return {
-        data: data[0],
-        total: data[1],
+        data: data,
+        total: total,
       };
     } catch (error) {
       throw error;
     }
   }
+  
+  
 
   async findOne(id: string) {
     try {
+      const userQuery = this.usersRepository
+        .createQueryBuilder('user')
+        .leftJoinAndSelect('user.rol', 'roles')
+        .select([
+          'user.id', 
+          'user.name',
+          'user.last_name',
+          'user.user_name', 
+          'user.email',
+          'user.created_at',
+          'user.updated_at',
+          'roles.id',
+          'roles.rol',
+        ]) 
+        .where('user.id = :id', { id })
+        .andWhere('user.deleted_at IS NULL');
 
-      const user = await this.usersRepository.find({
-        where: {
-          id: id,
-          deleted_at: null
-        },
-        select: this.fields
-      });
+      const user = await userQuery.getOne();
+
       if (!user) {
         throw new BadRequestException('user not found');
       }
-      return user;
+      return UserMapper(user);
     } catch (error) {
       throw error;
     }
@@ -125,25 +161,20 @@ export class UsersService {
 
   async update(id: string, updateUserDto: UpdateUserDto) {
     try {
-      const { user_name, email } = updateUserDto;
+      const { user_name, email, rol_id } = updateUserDto;
 
       const user = await this.usersRepository.findOneBy({ id, deleted_at: null });
 
-      const userNameExists = await this.usersRepository.findOneBy({
-        user_name,
-        deleted_at: null,
-        id: Not(id),
-      });
+      if (!user) {
+        throw new BadRequestException('user not found');
+      }
 
-      const emailExists = await this.usersRepository.findOneBy({
-        email,
-        deleted_at: null,
-        id: Not(id),
-      });
-
+      if(await this.userNameOrEmailExists(user_name, email, id, true) !== null) {
+        throw new BadRequestException('user name or email already exists');
+      }
 
       const rolExists = await this.rolRepository.findOneBy({
-        id: updateUserDto.rol,
+        id: updateUserDto.rol_id,
         deleted_at: null,
       });
 
@@ -151,36 +182,14 @@ export class UsersService {
         throw new BadRequestException('Rol not found');
       }
 
-      if (userNameExists) {
-        throw new BadRequestException('user name already exists');
-      }
-
-      if (emailExists) {
-        throw new BadRequestException('email already exists');
-      }
-
-      if (!user) {
-        throw new BadRequestException('user not found');
-      } else {
         updateUserDto.password = await bcryptjs.hash(updateUserDto.password, 10);
-
-        const updatedUser = this.usersRepository.save({ ...user, ...updateUserDto } );
-        console.log(await updatedUser);
+        const updatedUser = await this.usersRepository.save({ ...user, ...updateUserDto, rol: rol_id } );
 
         return {
           message: 'user updated successfully',
-          data: {
-            name: (await updatedUser).name,
-            last_name: (await updatedUser).last_name,
-            phone_number: (await updatedUser).phone_number,
-            email: (await updatedUser).email,
-            user_name: (await updatedUser).user_name,
-            rol : (await updatedUser).rol
-          }
-           
-          
+          data: await UserMapper(updatedUser)
         };
-      }
+
     } catch (error) {
       throw error
     }

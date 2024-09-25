@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
-import { IsEmail, IsNumber, isNumber, IsString, MinLength } from 'class-validator';
 import { Rol } from 'src/rol/entities/rol.entity';
+import { IsEmail, IsNumber, isNumber, IsString, MinLength } from 'class-validator';
 
 import {
   Column,
@@ -14,6 +14,7 @@ import {
   UpdateDateColumn,
   JoinColumnOptions,
   SelectQueryBuilder
+  
 } from 'typeorm';
 
 
@@ -67,11 +68,9 @@ export class User {
   @IsNumber()
   @JoinColumn({ name: 'rol' })
   @ManyToOne(() => Rol, (rol) => rol.user, {
-    eager: true,
-
+    eager: true
   })
-  rol: number;
-
+  rol: Rol | number;
 
   @CreateDateColumn()
   created_at: Date;

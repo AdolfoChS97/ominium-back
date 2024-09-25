@@ -32,7 +32,7 @@ export class AuthService {
     if (emailExists) {
       throw new BadRequestException('email already exists');
     }
-    const registerUser = {...registerDto , rol : 1};
+    const registerUser = {...registerDto , rol_id : this.usersService.USER };
 
     return await this.usersService.create(registerUser);
   }

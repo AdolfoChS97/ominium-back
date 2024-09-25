@@ -6,7 +6,7 @@ import { User } from "src/users/entities/user.entity";
 import { Column, CreateDateColumn, OneToMany, PrimaryGeneratedColumn, Entity, DeleteDateColumn } from "typeorm";
 
 
-@Entity({ name: 'Rol' })
+@Entity({ name: 'Roles' })
 export class Rol {
     @ApiProperty({ example: '1', description: 'Unique identifier' })
     @PrimaryGeneratedColumn()

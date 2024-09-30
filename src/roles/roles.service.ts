@@ -2,21 +2,19 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateRolDto } from './dto/create-role.dto';
 import { UpdateRolDto } from './dto/update-role.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Rol } from './entities/roles.entity';
+import { Roles } from './entities/roles.entity';
 import { Not, Repository } from 'typeorm';
 
 @Injectable()
-export class RolService {
+export class RolesService {
   constructor(
-    @InjectRepository(Rol)
-    private readonly rolRepository: Repository<Rol>,
-  ){}
-
+    @InjectRepository(Roles)
+    private readonly rolesRepository: Repository<Roles>,
+  ) {}
 
   async create(createRolDto: CreateRolDto) {
     try {
-
-      const rolExists = await this.rolRepository.findOneBy({
+      const rolExists = await this.rolesRepository.findOneBy({
         rol: createRolDto.rol,
         deleted_at: null,
       });
@@ -24,9 +22,8 @@ export class RolService {
         throw new BadRequestException('Rol already exists');
       }
 
-      const rol = await this.rolRepository.save(createRolDto);
+      const rol = await this.rolesRepository.save(createRolDto);
       return rol;
-
     } catch (error) {
       throw error;
     }
@@ -34,7 +31,7 @@ export class RolService {
 
   findAll() {
     try {
-      const data = this.rolRepository.find({
+      const data = this.rolesRepository.find({
         where: { deleted_at: null },
       });
 
@@ -48,10 +45,10 @@ export class RolService {
     return `This action returns a #${id} rol`;
   }
 
- async update(id: number, updateRolDto: UpdateRolDto) {
+  async update(id: number, updateRolDto: UpdateRolDto) {
     try {
       const { rol } = updateRolDto;
-      const rolExists = await this.rolRepository.findOneBy({
+      const rolExists = await this.rolesRepository.findOneBy({
         id,
         deleted_at: null,
       });
@@ -59,7 +56,7 @@ export class RolService {
         throw new BadRequestException('Rol not found');
       }
 
-      const rolAlreadyExists = await this.rolRepository.findOneBy({
+      const rolAlreadyExists = await this.rolesRepository.findOneBy({
         rol,
         deleted_at: null,
         id: Not(id),
@@ -69,23 +66,22 @@ export class RolService {
         throw new BadRequestException('Rol already exists');
       }
 
-      return this.rolRepository.save({id , ...updateRolDto });
-
-    } catch (error) { 
+      return this.rolesRepository.save({ id, ...updateRolDto });
+    } catch (error) {
       throw error;
     }
   }
 
   remove(id: number) {
     try {
-      const rol = this.rolRepository.findOneBy({ id, deleted_at: null });
+      const rol = this.rolesRepository.findOneBy({ id, deleted_at: null });
       if (!rol) {
         throw new BadRequestException('Rol not found');
       }
-      this.rolRepository.save({ ...rol, deleted_at: new Date() });
-      return { 
+      this.rolesRepository.save({ ...rol, deleted_at: new Date() });
+      return {
         message: 'Rol deleted successfully',
-       };
+      };
     } catch (error) {
       throw error;
     }

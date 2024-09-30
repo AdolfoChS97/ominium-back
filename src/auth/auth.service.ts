@@ -20,8 +20,7 @@ export class AuthService {
 
   async register(registerDto: RegisterDto) {
     const { user_name, email } = registerDto;
-    
-    
+
     const userNameExists = await this.usersService.findOneByUserName(user_name);
 
     const emailExists = await this.usersService.findOneByEmail(email);
@@ -32,12 +31,12 @@ export class AuthService {
     if (emailExists) {
       throw new BadRequestException('email already exists');
     }
-    const registerUser = {...registerDto , rol_id : this.usersService.USER };
+    const registerUser = { ...registerDto, rol_id: this.usersService.USER };
 
     return await this.usersService.create(registerUser);
   }
 
-  async login({ user_name, password  }: LoginDto) {
+  async login({ user_name, password }: LoginDto) {
     const user = await this.usersService.findOneByUserName(user_name);
 
     if (!user) {
@@ -59,6 +58,6 @@ export class AuthService {
       expiresIn: this.configService.get('JWT_TIME_EXPI'),
     });
 
-    return { token , user_name , rol: user.rol };
+    return { token, user_name, rol: user.rol };
   }
 }

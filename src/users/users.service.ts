@@ -1,6 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { UpdateUserPasswordDto } from './dto/update-userPassword';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/users/entities/user.entity';
 import { Repository } from 'typeorm';
@@ -182,7 +183,6 @@ export class UsersService {
         throw new BadRequestException('Rol not found');
       }
 
-        updateUserDto.password = await bcryptjs.hash(updateUserDto.password, 10);
         const updatedUser = await this.usersRepository.save({ ...user, ...updateUserDto, rol: rol_id } );
 
         return {
@@ -194,6 +194,31 @@ export class UsersService {
       throw error
     }
   }
+
+
+  async updatePassword(id: string , UpdateUserPasswordDto: UpdateUserPasswordDto) {
+    try {
+      const user = await  this.usersRepository.findOneBy({ id, deleted_at: null });
+      if (!user) {
+        throw new BadRequestException('user not found');
+      }
+
+      const { password } = UpdateUserPasswordDto;
+
+      user.password = await bcryptjs.hash(password, 10);
+
+      await this.usersRepository.save(user);
+
+      return {
+        message: 'user updated successfully',
+      };
+
+    }
+    catch (error) {
+      throw error
+    }
+  }
+
 
   remove(id: string) {
     const user = this.usersRepository.findOneBy({ id, deleted_at: null });

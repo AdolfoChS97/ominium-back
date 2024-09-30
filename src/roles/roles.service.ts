@@ -1,8 +1,8 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { CreateRolDto } from './dto/create-rol.dto';
-import { UpdateRolDto } from './dto/update-rol.dto';
+import { CreateRolDto } from './dto/create-role.dto';
+import { UpdateRolDto } from './dto/update-role.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Rol } from './entities/rol.entity';
+import { Rol } from './entities/roles.entity';
 import { Not, Repository } from 'typeorm';
 
 @Injectable()

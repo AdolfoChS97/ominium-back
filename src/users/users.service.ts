@@ -7,7 +7,7 @@ import { User } from 'src/users/entities/user.entity';
 import { Repository } from 'typeorm';
 import * as bcryptjs from 'bcryptjs';
 import { PaginationQueryParamsDto } from 'src/shared/dtos/paginatio.dto';
-import { Rol } from 'src/roles/entities/rol.entity';
+import { Rol } from 'src/roles/entities/roles.entity';
 import { UserMapper } from './mappers';
 
 

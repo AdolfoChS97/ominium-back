@@ -1,6 +1,6 @@
 import { OmitType } from "@nestjs/swagger";
 import { IsString, MinLength } from "class-validator";
-import { Rol } from "../entities/rol.entity";
+import { Rol } from "../entities/roles.entity";
 
 export class CreateRolDto extends OmitType (Rol, [
     'id',

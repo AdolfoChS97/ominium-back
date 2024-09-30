@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
-import { Rol } from 'src/roles/entities/rol.entity';
+import { Rol } from 'src/roles/entities/roles.entity';
 import { IsEmail, IsNumber, isNumber, IsString, MinLength } from 'class-validator';
 
 import {

@@ -7,6 +7,8 @@ import { UsersModule } from './users/users.module';
 import { DataSource } from 'typeorm';
 import { AuthModule } from './auth/auth.module';
 import { RolesModule } from './roles/roles.module';
+import { ResourcesModule } from './resources/resources.module';
+import { PermissionsModule } from './permissions/permissions.module';
 
 const configService = new ConfigService();
 
@@ -29,6 +31,8 @@ const configService = new ConfigService();
     }),
     AuthModule,
     RolesModule,
+    ResourcesModule,
+    // PermissionsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

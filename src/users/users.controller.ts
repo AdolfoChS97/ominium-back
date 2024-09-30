@@ -11,6 +11,7 @@ import {
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { UpdateUserPasswordDto } from './dto/update-userPassword';
 import { ApiQuery, ApiTags } from '@nestjs/swagger';
 import { PaginationQueryParamsDto } from 'src/shared/dtos/paginatio.dto';
 import { Order } from 'src/shared/dtos/paginatio.dto';
@@ -52,6 +53,12 @@ export class UsersController {
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.usersService.update(id, updateUserDto);
+  }
+
+  @Patch(':id/change-password')
+  updatePassword(@Param('id') id: string, @Body() UpdateUserPasswordDto: UpdateUserPasswordDto,
+  ){
+    return this.usersService.updatePassword(id, UpdateUserPasswordDto);
   }
 
   @Delete(':id')

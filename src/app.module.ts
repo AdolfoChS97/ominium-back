@@ -6,7 +6,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModule } from './users/users.module';
 import { DataSource } from 'typeorm';
 import { AuthModule } from './auth/auth.module';
-import { RolModule } from './roles/roles.module';
+import { RolesModule } from './roles/roles.module';
 
 const configService = new ConfigService();
 
@@ -28,7 +28,7 @@ const configService = new ConfigService();
       synchronize: true,
     }),
     AuthModule,
-    RolModule,
+    RolesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

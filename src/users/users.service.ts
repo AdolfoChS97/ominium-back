@@ -6,9 +6,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/users/entities/user.entity';
 import { Repository } from 'typeorm';
 import * as bcryptjs from 'bcryptjs';
-import { Not } from 'typeorm';
 import { PaginationQueryParamsDto } from 'src/shared/dtos/paginatio.dto';
-import { Rol } from 'src/rol/entities/rol.entity';
+import { Rol } from 'src/roles/entities/rol.entity';
 import { UserMapper } from './mappers';
 
 

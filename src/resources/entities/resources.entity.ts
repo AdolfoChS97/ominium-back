@@ -41,9 +41,9 @@ export class Resources {
     length: 50,
     nullable: false,
     unique: true,
-    default: '/',
+    default: null,
   })
-  path: string;
+  route: string;
 
   @ApiProperty({ example: 'UUID', description: 'Parent resource' })
   @IsString()

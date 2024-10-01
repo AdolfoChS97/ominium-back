@@ -123,7 +123,7 @@ export class ResourcesService {
       const r = await this.resourcesRepository
         .createQueryBuilder('resources')
         .where(`resources.${query} = :${query}`, { [query]: param })
-        .getOne();
+        .getRawOne();
       return r;
     } catch (e) {
       errorHandler(e);
@@ -157,7 +157,7 @@ export class ResourcesService {
       sort: 'DESC' as Order,
       name: null,
       parent: null,
-      path: null,
+      route: null,
       order: null,
       since: moment().format('DD-MM-YYYY'),
       until: moment().add(1, 'd').format('DD-MM-YYYY'),
@@ -166,12 +166,15 @@ export class ResourcesService {
   ) {
     try {
       const query = queryParamsHandler(
-        await this.resourcesRepository.createQueryBuilder('resources'),
+        await this.resourcesRepository
+          .createQueryBuilder('resources')
+          .select(['resources.*']),
         queryParams,
         trash,
       );
-      const [rows, total] = await (await query).getManyAndCount();
-      return { rows: rows, total: total };
+      const results = await (await query).getRawMany();
+      return results;
+      // return { rows: rows, total: total };
     } catch (e) {
       errorHandler(e);
     }

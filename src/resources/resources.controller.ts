@@ -74,6 +74,21 @@ export class ResourcesController {
     required: false,
   })
   @ApiQuery({
+    name: 'parent',
+    type: String,
+    required: false,
+  })
+  @ApiQuery({
+    name: 'route',
+    type: String,
+    required: false,
+  })
+  @ApiQuery({
+    name: 'order',
+    type: Number,
+    required: false,
+  })
+  @ApiQuery({
     name: 'until',
     type: String,
     required: false,

@@ -104,15 +104,72 @@ export class ResourcesService {
     }
   }
 
+  async removeParentByChild(parent: string, child: string) {
+    try {
+      if (!parent || !child)
+        throw new BadRequestException(
+          'It needs at least two resources to remove them',
+        );
+
+      const promises = await Promise.allSettled([
+        this.getOneBy('id', parent),
+        this.getOneBy('id', child),
+      ]);
+
+      const [parentR, childR] = promises.map(
+        (p: PromiseSettledResult<Awaited<Resources>>) => {
+          const { status } = p;
+          if (status === 'rejected')
+            throw new InternalServerErrorException(
+              'We could not process the request',
+            );
+          return p?.value;
+        },
+        [],
+      );
+
+      if (!parentR.parent)
+        throw new BadRequestException(
+          'We could not remove a non parent resource',
+        );
+
+      const updated = await this.resourcesRepository.update(childR.id, {
+        parent: null,
+        updated_at: new Date(),
+      });
+
+      if (updated.affected === 0)
+        throw new InternalServerErrorException(
+          'We could not process the request',
+        );
+
+      return {
+        message: 'Resource removed successfully',
+      };
+
+    } catch (e) {
+      errorHandler(e);
+    }
+  }
+
   async update(id: string, resource: UpdateResourceDto) {
     try {
       const r = await this.getOneBy('id', id);
       if (!r) throw new BadRequestException('Resource not found');
 
+      if (r.parent) {
+        const parent = await this.getOneBy('id', resource.parent as string);
+        if (!parent)
+          throw new BadRequestException(
+            'We could not assign a resource to a non-existent parent',
+          );
+      }
+
       const updated = await this.resourcesRepository.save({
         id: r.id,
         updated_at: new Date(),
         ...resource,
+        parent: parent,
       });
 
       return ResourceMapper(updated, 'Resource updated successfully');

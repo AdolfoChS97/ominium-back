@@ -52,6 +52,27 @@ export class ResourcesController {
   async assign(@Param('parent') parent: string, @Param('child') child: string) {
     return await this.resourcesService.assign(parent, child);
   }
+
+  @ApiParam({
+    name: 'parent',
+    type: String,
+    required: true,
+    description: 'Parent resource id',
+  })
+  @ApiParam({
+    name: 'child',
+    type: String,
+    required: true,
+    description: 'Child resource id',
+  })
+  @Post(':parent/remove/:child')
+  async removeParentByChild(
+    @Param('parent') parent: string,
+    @Param('child') child: string,
+  ) {
+    return await this.resourcesService.removeParentByChild(parent, child);
+  }
+
   @ApiQuery({
     name: 'pageNumber',
     type: Number,

@@ -74,6 +74,44 @@ export class ResourcesController {
     return await this.resourcesService.getAll(queryParams);
   }
 
+  @ApiQuery({
+    name: 'pageNumber',
+    type: Number,
+    required: false,
+  })
+  @ApiQuery({
+    name: 'pageSize',
+    type: Number,
+    required: false,
+  })
+  @ApiQuery({
+    name: 'sort',
+    enumName: 'Order',
+    enum: Order,
+    required: false,
+  })
+  @ApiQuery({
+    name: 'name',
+    type: String,
+    required: false,
+  })
+  @ApiQuery({
+    name: 'until',
+    type: String,
+    required: false,
+  })
+  @ApiQuery({
+    name: 'since',
+    type: String,
+    required: false,
+  })
+  @Get('trash')
+  async getTrash(
+    @Query() queryParams: ResourceFiltersDto & PaginationQueryParamsDto,
+  ) {
+    return await this.resourcesService.getAll(queryParams, true);
+  }
+
   @ApiParam({
     example: 'UUID',
     name: 'id',

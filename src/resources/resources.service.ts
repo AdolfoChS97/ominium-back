@@ -72,11 +72,13 @@ export class ResourcesService {
       since: moment().format('DD-MM-YYYY'),
       until: moment().add(1, 'd').format('DD-MM-YYYY'),
     },
+    trash: boolean = false,
   ) {
     try {
       const query = queryParamsHandler(
         await this.resourcesRepository.createQueryBuilder('resources'),
         queryParams,
+        trash,
       );
       const [rows, total] = await (await query).getManyAndCount();
       return { rows: rows, total: total };

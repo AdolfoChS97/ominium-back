@@ -5,8 +5,10 @@ import { InternalServerErrorException } from '@nestjs/common';
 export const queryParamsHandler = async (
   query: SelectQueryBuilder<any>,
   queryParams: Record<string, any> = {},
+  trash: boolean = false,
 ): Promise<SelectQueryBuilder<any>> => {
   try {
+    const alias = query.alias;
     const { pageNumber, pageSize, sort, since, until, ...rest } = queryParams;
     const page =
       pageNumber && !isNaN(+pageNumber) && +pageNumber > 0 ? +pageNumber : 1;
@@ -17,7 +19,7 @@ export const queryParamsHandler = async (
     if (keys.length > 0) {
       keys.forEach((key) => {
         if (rest[key]) {
-          query.andWhere(`resources.${key} = :${key}`, { [key]: rest[key] });
+          query.andWhere(`${alias}.${key} = :${key}`, { [key]: rest[key] });
         }
       });
     }
@@ -26,14 +28,21 @@ export const queryParamsHandler = async (
       const sinceDate = moment(since, 'DD-MM-YYYY')
         .startOf('day')
         .format('YYYY-MM-DD HH:mm:ss');
-      query.andWhere(`resources.created_at >= :since`, { since: sinceDate });
+      query.andWhere(`${alias}.created_at >= :since`, { since: sinceDate });
     }
 
     if (moment(until, 'DD-MM-YYYY', true).isValid()) {
       const untilDate = moment(until, 'DD-MM-YYYY')
         .endOf('day')
         .format('YYYY-MM-DD HH:mm:ss');
-      query.andWhere(`resources.created_at <= :until`, { until: untilDate });
+      query.andWhere(`${alias}.created_at <= :until`, { until: untilDate });
+    }
+
+    if (!trash) {
+      query.andWhere(`${alias}.deleted_at IS NULL`);
+    } else {
+      query.andWhere(`${alias}.deleted_at IS NOT NULL`);
+      query.withDeleted();
     }
 
     const total = await query.getCount();
@@ -41,7 +50,7 @@ export const queryParamsHandler = async (
       query.skip((page - 1) * size).take(size);
     }
 
-    query.orderBy('resources.created_at', sort || 'DESC');
+    query.orderBy(`${alias}.created_at`, sort || 'DESC');
     return query;
   } catch (e) {
     throw new InternalServerErrorException('Error handling query params', {

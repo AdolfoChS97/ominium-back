@@ -1,17 +1,19 @@
-import { Body, Controller, Get, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { ResourcesService } from './resources.service';
 import { CreateResourceDto } from './dtos/create-resource.dto';
-import { ApiQuery, ApiTags } from '@nestjs/swagger';
-import { Order, PaginationQueryParamsDto } from 'src/shared/dtos/pagination.dto';
+import { ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
+import {
+  Order,
+  PaginationQueryParamsDto,
+} from 'src/shared/dtos/pagination.dto';
 import { ResourceFiltersDto } from './dtos/resource-filters.dto';
-import { QueryDatesFiltersDto } from 'src/shared/dtos/query-date-filters.dto';
 
 @ApiTags('Resources')
 @Controller('resources')
 export class ResourcesController {
   constructor(private readonly resourcesService: ResourcesService) {}
 
-  @Post('')
+  @Post()
   async create(
     @Body()
     { name }: CreateResourceDto,
@@ -55,5 +57,15 @@ export class ResourcesController {
     @Query() queryParams: ResourceFiltersDto & PaginationQueryParamsDto,
   ) {
     return await this.resourcesService.getAll(queryParams);
+  }
+
+  @ApiParam({
+    example: 'UUID',
+    name: 'id',
+    required: true,
+  })
+  @Get(':id')
+  async getOne(@Param('id') id: string) {
+    return await this.resourcesService.getOneBy('id', id);
   }
 }

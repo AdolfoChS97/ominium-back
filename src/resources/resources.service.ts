@@ -14,6 +14,7 @@ import {
 import { ResourceFiltersDto } from './dtos/resource-filters.dto';
 import * as moment from 'moment';
 import { queryParamsHandler } from 'src/shared/utils/query-params-handler';
+import { errorHandler } from 'src/shared/utils/error-handler';
 
 @Injectable()
 export class ResourcesService {
@@ -29,20 +30,22 @@ export class ResourcesService {
       const created = await this.resourcesRepository.save({ name: resource });
       return ResourceMapper(created, 'Resource created successfully');
     } catch (e) {
-      throw e;
+      errorHandler(e);
     }
   }
 
   async getOneBy(query: 'name' | 'id', param: string) {
     try {
-      return await this.resourcesRepository
+      const r = await this.resourcesRepository
         .createQueryBuilder('resources')
         .where(`resources.${query} = :${query}`, { [query]: param })
         .getOne();
+      if (!r) {
+        throw new BadRequestException('Resource not found');
+      }
+      return r;
     } catch (e) {
-      throw new InternalServerErrorException('Error getting resource', {
-        cause: e,
-      });
+      errorHandler(e);
     }
   }
 
@@ -64,9 +67,7 @@ export class ResourcesService {
       const [rows, total] = await (await query).getManyAndCount();
       return { rows: rows, total: total };
     } catch (e) {
-      throw new InternalServerErrorException('Error getting resources', {
-        cause: e,
-      });
+      errorHandler(e);
     }
   }
 }

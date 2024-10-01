@@ -30,17 +30,25 @@ export class ResourcesService {
       const r = await this.getOneBy('name', resource.name);
       if (r) throw new BadRequestException('Resource already exists');
 
-      if (resource.order) {
+      if (resource.order && resource.parent) {
         const parent = await this.getOneBy('id', resource.parent as string);
         if (!parent)
           throw new BadRequestException(
             'We could not assign a resource to a non-existent parent',
           );
+
+        const created = await this.resourcesRepository.save({
+          ...resource,
+          parent: parent,
+        });
+
+        return ResourceMapper(created, 'Resource created successfully');
       }
+
       const created = await this.resourcesRepository.save({
         ...resource,
-        parent: parent,
       });
+
       return ResourceMapper(created, 'Resource created successfully');
     } catch (e) {
       errorHandler(e);
@@ -60,7 +68,7 @@ export class ResourcesService {
       ]);
 
       const [parentR, childR] = promises.map(
-        (p: PromiseSettledResult<Awaited<Resources>>) => {
+        (p: PromiseSettledResult<Awaited<any>>) => {
           const { status } = p;
           if (status === 'rejected')
             throw new InternalServerErrorException(
@@ -71,7 +79,7 @@ export class ResourcesService {
         [],
       );
 
-      if (parentR.parent)
+      if (parentR.parentId)
         throw new BadRequestException(
           'We could not assign a child resource as a parent resource',
         );
@@ -117,7 +125,7 @@ export class ResourcesService {
       ]);
 
       const [parentR, childR] = promises.map(
-        (p: PromiseSettledResult<Awaited<Resources>>) => {
+        (p: PromiseSettledResult<Awaited<any>>) => {
           const { status } = p;
           if (status === 'rejected')
             throw new InternalServerErrorException(
@@ -128,13 +136,14 @@ export class ResourcesService {
         [],
       );
 
-      if (!parentR.parent)
+      if (parentR?.parentId)
         throw new BadRequestException(
           'We could not remove a non parent resource',
         );
 
       const updated = await this.resourcesRepository.update(childR.id, {
         parent: null,
+        order: null,
         updated_at: new Date(),
       });
 
@@ -146,7 +155,6 @@ export class ResourcesService {
       return {
         message: 'Resource removed successfully',
       };
-
     } catch (e) {
       errorHandler(e);
     }

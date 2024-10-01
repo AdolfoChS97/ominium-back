@@ -1,8 +1,4 @@
-import {
-  BadRequestException,
-  Injectable,
-  InternalServerErrorException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { Resources } from './entities/resources.entity';
 import { Repository } from 'typeorm';
 import { ResourceMapper } from './mappers/resources.mapper';
@@ -15,6 +11,7 @@ import { ResourceFiltersDto } from './dtos/resource-filters.dto';
 import * as moment from 'moment';
 import { queryParamsHandler } from 'src/shared/utils/query-params-handler';
 import { errorHandler } from 'src/shared/utils/error-handler';
+import { UpdateResourceDto } from './dtos/update-resource.dto';
 
 @Injectable()
 export class ResourcesService {
@@ -29,6 +26,23 @@ export class ResourcesService {
         throw new BadRequestException('Resource already exists');
       const created = await this.resourcesRepository.save({ name: resource });
       return ResourceMapper(created, 'Resource created successfully');
+    } catch (e) {
+      errorHandler(e);
+    }
+  }
+
+  async update(id: string, resource: UpdateResourceDto) {
+    try {
+      const r = await this.getOneBy('id', id);
+      if (!r) throw new BadRequestException('Resource not found');
+
+      const updated = await this.resourcesRepository.save({
+        id: r.id,
+        updated_at: new Date(),
+        ...resource,
+      });
+
+      return ResourceMapper(updated, 'Resource updated successfully');
     } catch (e) {
       errorHandler(e);
     }

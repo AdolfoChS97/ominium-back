@@ -31,13 +31,16 @@ export class ResourcesService {
       if (r) throw new BadRequestException('Resource already exists');
 
       if (resource.order) {
-        const parent = await this.getOneBy('id', resource.parent);
+        const parent = await this.getOneBy('id', resource.parent as string);
         if (!parent)
           throw new BadRequestException(
             'We could not assign a resource to a non-existent parent',
           );
       }
-      const created = await this.resourcesRepository.save({ ...resource });
+      const created = await this.resourcesRepository.save({
+        ...resource,
+        parent: parent,
+      });
       return ResourceMapper(created, 'Resource created successfully');
     } catch (e) {
       errorHandler(e);
@@ -80,7 +83,7 @@ export class ResourcesService {
       }
 
       const updated = await this.resourcesRepository.update(childR.id, {
-        parent: parentR.id as unknown as string,
+        parent: parentR,
         order:
           (await this.getLastChildrenByParent(
             parentR.id as unknown as string,
@@ -158,6 +161,7 @@ export class ResourcesService {
       sort: 'DESC' as Order,
       name: null,
       parent: null,
+      children: null,
       route: null,
       order: null,
       since: moment().format('DD-MM-YYYY'),
@@ -169,6 +173,7 @@ export class ResourcesService {
       const query = queryParamsHandler(
         await this.resourcesRepository
           .createQueryBuilder('resources')
+          .leftJoinAndSelect('resources.parent', 'parent')
           .select(['resources.*']),
         queryParams,
         trash,

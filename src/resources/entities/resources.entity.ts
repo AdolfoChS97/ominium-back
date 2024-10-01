@@ -14,6 +14,9 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -23,12 +26,12 @@ export class Resources {
   @ApiProperty({ example: '1', description: 'Unique identifier' })
   @PrimaryGeneratedColumn('uuid')
   @IsString()
-  id: number;
+  id: string;
 
   @ApiProperty({ example: 'users', description: 'Resource name' })
   @IsString()
   @IsNotEmpty()
-  @Transform(({ value }) => value.trim() && value.toLowerCase())
+  @Transform(({ value }) => value.trim().toLowerCase())
   @Column('varchar', { length: 50, nullable: false, unique: true })
   name: string;
 
@@ -36,7 +39,7 @@ export class Resources {
   @IsString()
   @IsNotEmpty()
   @IsFlexiblePath()
-  @Transform(({ value }) => value.trim() && value.toLowerCase())
+  @Transform(({ value }) => value.trim().toLowerCase())
   @Column('varchar', {
     length: 50,
     nullable: false,
@@ -49,8 +52,14 @@ export class Resources {
   @IsString()
   @IsOptional()
   @Transform(({ value }) => value.trim())
-  @Column('varchar', { length: 50, nullable: true, default: null })
-  parent: string;
+  @ManyToOne(() => Resources, (resource) => resource.children, {
+    nullable: true,
+  })
+  @JoinColumn({ name: 'parentId' })
+  parent: Resources | string;
+
+  @OneToMany(() => Resources, (resource) => resource.parent)
+  children: Resources[];
 
   @ApiProperty({ example: 1, description: 'Resource order' })
   @IsOptional()

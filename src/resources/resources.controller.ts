@@ -31,11 +31,27 @@ export class ResourcesController {
   @Post()
   async create(
     @Body()
-    { name }: CreateResourceDto,
+    resource: CreateResourceDto,
   ) {
-    return await this.resourcesService.create(name);
+    return await this.resourcesService.create(resource);
   }
 
+  @ApiParam({
+    name: 'parent',
+    type: String,
+    required: true,
+    description: 'Parent resource id',
+  })
+  @ApiParam({
+    name: 'child',
+    type: String,
+    required: true,
+    description: 'Child resource id',
+  })
+  @Post(':parent/assign/:child')
+  async assign(@Param('parent') parent: string, @Param('child') child: string) {
+    return await this.resourcesService.assign(parent, child);
+  }
   @ApiQuery({
     name: 'pageNumber',
     type: Number,

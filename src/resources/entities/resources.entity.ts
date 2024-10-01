@@ -3,9 +3,12 @@ import { Transform } from 'class-transformer';
 import {
   IsDateString,
   IsNotEmpty,
+  IsNumber,
   IsOptional,
+  IsPositive,
   IsString,
 } from 'class-validator';
+import { IsFlexiblePath } from 'src/shared/decorators/is-flexible-path';
 import {
   Column,
   CreateDateColumn,
@@ -28,6 +31,34 @@ export class Resources {
   @Transform(({ value }) => value.trim() && value.toLowerCase())
   @Column('varchar', { length: 50, nullable: false, unique: true })
   name: string;
+
+  @ApiProperty({ example: '/users', description: 'Resource path' })
+  @IsString()
+  @IsNotEmpty()
+  @IsFlexiblePath()
+  @Transform(({ value }) => value.trim() && value.toLowerCase())
+  @Column('varchar', {
+    length: 50,
+    nullable: false,
+    unique: true,
+    default: '/',
+  })
+  path: string;
+
+  @ApiProperty({ example: 'UUID', description: 'Parent resource' })
+  @IsString()
+  @IsOptional()
+  @Transform(({ value }) => value.trim())
+  @Column('varchar', { length: 50, nullable: true, default: null })
+  parent: string;
+
+  @ApiProperty({ example: 1, description: 'Resource order' })
+  @IsOptional()
+  @IsNumber()
+  @IsPositive()
+  @Transform(({ value }) => Number(value))
+  @Column('int', { nullable: true, default: null })
+  order: number;
 
   @CreateDateColumn()
   @IsOptional()

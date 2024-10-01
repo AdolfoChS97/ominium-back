@@ -6,6 +6,9 @@ export const ResourceMapper = (data: Resources, message?: string) => {
     const resource = {
       id: data.id,
       name: data.name,
+      path: data.path,
+      parent: data.parent,
+      order: data.order,
       created_at: data.created_at,
       updated_at: data.updated_at,
       deleted_at: data.deleted_at,

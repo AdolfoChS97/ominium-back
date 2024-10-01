@@ -165,19 +165,10 @@ export class ResourcesService {
       const r = await this.getOneBy('id', id);
       if (!r) throw new BadRequestException('Resource not found');
 
-      if (r.parent) {
-        const parent = await this.getOneBy('id', resource.parent as string);
-        if (!parent)
-          throw new BadRequestException(
-            'We could not assign a resource to a non-existent parent',
-          );
-      }
-
       const updated = await this.resourcesRepository.save({
         id: r.id,
         updated_at: new Date(),
         ...resource,
-        parent: parent,
       });
 
       return ResourceMapper(updated, 'Resource updated successfully');

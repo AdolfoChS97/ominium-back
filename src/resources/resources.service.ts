@@ -84,4 +84,19 @@ export class ResourcesService {
       errorHandler(e);
     }
   }
+
+  async delete(id: string) {
+    try {
+      const r = await this.getOneBy('id', id);
+      if (!r) throw new BadRequestException('Resource not found');
+
+      const deleted = await this.resourcesRepository.save({
+        id: r.id,
+        deleted_at: new Date(),
+      });
+      return ResourceMapper(deleted, 'Resource deleted successfully');
+    } catch (e) {
+      errorHandler(e);
+    }
+  }
 }

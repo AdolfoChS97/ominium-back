@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Patch,
@@ -100,5 +101,17 @@ export class ResourcesController {
   @Patch(':id')
   async update(@Param('id') id: string, @Body() resource: UpdateResourceDto) {
     return await this.resourcesService.update(id, resource);
+  }
+
+  @ApiParam({
+    example: 'UUID',
+    name: 'id',
+    required: true,
+    type: String,
+    description: 'Resource ID',
+  })
+  @Delete(':id')
+  async delete(@Param('id') id: string) {
+    return await this.resourcesService.delete(id);
   }
 }

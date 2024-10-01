@@ -4,8 +4,8 @@ export const IsFlexiblePath = () => {
   return applyDecorators((target: any, propertyKey: string) => {
     let value: string;
 
-    // Regex actualizado para validar rutas flexibles incluyendo el formato "/:param/segment"
-    const regex = /^\/(:?[a-zA-Z0-9_-]+(\/:[a-zA-Z0-9_-]+)?)+$/;
+    const regex =
+      /^\/([a-zA-Z0-9_-]+(\/:[a-zA-Z0-9_-]+)?)*(\/[a-zA-Z0-9_-]+)?$/;
 
     const getter = function () {
       return value;

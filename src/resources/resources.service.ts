@@ -241,10 +241,29 @@ export class ResourcesService {
     }
   }
 
+  async getChildrenByParent(parent: string) {
+    try {
+      const children = await this.resourcesRepository
+        .createQueryBuilder('resources')
+        .where('resources.parentId = :parent', { parent: parent })
+        .getRawMany();
+
+      return children;
+    } catch (e) {
+      errorHandler(e);
+    }
+  }
+
   async delete(id: string) {
     try {
       const r = await this.getOneBy('id', id);
       if (!r) throw new BadRequestException('Resource not found');
+
+      const children = await this.getChildrenByParent(r.id);
+      if (children.length > 0)
+        throw new BadRequestException(
+          'We could not delete a parent resource with children',
+        );
 
       const deleted = await this.resourcesRepository.save({
         id: r.id,

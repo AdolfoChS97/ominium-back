@@ -122,6 +122,7 @@ export class ResourcesService {
     try {
       const r = await this.resourcesRepository
         .createQueryBuilder('resources')
+        .select(['resources.*'])
         .where(`resources.${query} = :${query}`, { [query]: param })
         .getRawOne();
       return r;
@@ -172,9 +173,8 @@ export class ResourcesService {
         queryParams,
         trash,
       );
-      const results = await (await query).getRawMany();
-      return results;
-      // return { rows: rows, total: total };
+      const rows = await (await query).getRawMany();
+      return { rows: rows, total: rows.length };
     } catch (e) {
       errorHandler(e);
     }

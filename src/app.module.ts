@@ -9,6 +9,7 @@ import { RolesModule } from './modules/roles/modules/roles.module';
 import { ResourcesModule } from './modules/resources/resources.module';
 import { SeederModule } from './shared/modules/seeder.module';
 import { PostgresDatabaseProviderModule } from './shared/modules/postgres-database-provider.module';
+import { CondominiumsModule } from './modules/condominiums/condominiums.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { PostgresDatabaseProviderModule } from './shared/modules/postgres-databa
     RolesModule,
     ResourcesModule,
     SeederModule,
+    CondominiumsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

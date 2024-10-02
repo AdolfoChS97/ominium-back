@@ -31,7 +31,7 @@ export class AuthService {
     if (emailExists) {
       throw new BadRequestException('email already exists');
     }
-    const registerUser = { ...registerDto, rol_id: this.usersService.USER };
+    const registerUser = { ...registerDto, rol: this.usersService.USER };
 
     return await this.usersService.create(registerUser);
   }

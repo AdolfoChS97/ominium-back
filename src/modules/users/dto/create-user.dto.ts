@@ -11,5 +11,5 @@ export class CreateUserDto extends OmitType(User, [
 ]) {
   @ApiProperty({ example: '1', description: 'User rol' })
   @IsNumber()
-  rol_id: number;
+  rol: string;
 }

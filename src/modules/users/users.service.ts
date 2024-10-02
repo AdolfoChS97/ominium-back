@@ -12,7 +12,7 @@ import { UserMapper } from './mappers';
 
 @Injectable()
 export class UsersService {
-  public USER: number = 1;
+  public USER: string = 'user';
   public fields = {
     id: true,
     user_name: true,
@@ -62,14 +62,14 @@ export class UsersService {
   }
 
   async create(createUserDto: CreateUserDto) {
-    const { user_name, email, rol_id } = createUserDto;
+    const { user_name, email, rol } = createUserDto;
 
     if ((await this.userNameOrEmailExists(user_name, email)) !== null) {
       throw new BadRequestException('user name or email already exists');
     }
 
     const rolExists = await this.rolesRepository.findOneBy({
-      id: rol_id,
+      name: rol,
       deleted_at: null,
     });
 
@@ -82,7 +82,10 @@ export class UsersService {
     return {
       message: 'user created successfully',
       data: UserMapper(
-        await this.usersRepository.save({ ...createUserDto, rol: rol_id }),
+        await this.usersRepository.save({
+          ...createUserDto,
+          rol: rolExists.id,
+        }),
       ),
     };
   }

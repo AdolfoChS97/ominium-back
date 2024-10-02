@@ -31,9 +31,46 @@ export class ResourcesController {
   @Post()
   async create(
     @Body()
-    { name }: CreateResourceDto,
+    resource: CreateResourceDto,
   ) {
-    return await this.resourcesService.create(name);
+    return await this.resourcesService.create(resource);
+  }
+
+  @ApiParam({
+    name: 'parent',
+    type: String,
+    required: true,
+    description: 'Parent resource id',
+  })
+  @ApiParam({
+    name: 'child',
+    type: String,
+    required: true,
+    description: 'Child resource id',
+  })
+  @Post(':parent/assign/:child')
+  async assign(@Param('parent') parent: string, @Param('child') child: string) {
+    return await this.resourcesService.assign(parent, child);
+  }
+
+  @ApiParam({
+    name: 'parent',
+    type: String,
+    required: true,
+    description: 'Parent resource id',
+  })
+  @ApiParam({
+    name: 'child',
+    type: String,
+    required: true,
+    description: 'Child resource id',
+  })
+  @Post(':parent/remove/:child')
+  async removeParentByChild(
+    @Param('parent') parent: string,
+    @Param('child') child: string,
+  ) {
+    return await this.resourcesService.removeParentByChild(parent, child);
   }
 
   @ApiQuery({
@@ -55,6 +92,21 @@ export class ResourcesController {
   @ApiQuery({
     name: 'name',
     type: String,
+    required: false,
+  })
+  @ApiQuery({
+    name: 'parent',
+    type: String,
+    required: false,
+  })
+  @ApiQuery({
+    name: 'route',
+    type: String,
+    required: false,
+  })
+  @ApiQuery({
+    name: 'order',
+    type: Number,
     required: false,
   })
   @ApiQuery({

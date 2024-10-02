@@ -6,15 +6,12 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/users/entities/user.entity';
 import { Repository } from 'typeorm';
 import * as bcryptjs from 'bcryptjs';
-import { Not } from 'typeorm';
-import { PaginationQueryParamsDto } from 'src/shared/dtos/paginatio.dto';
-import { Rol } from 'src/rol/entities/rol.entity';
+import { PaginationQueryParamsDto } from 'src/shared/dtos/pagination.dto';
+import { Roles } from 'src/roles/entities/roles.entity';
 import { UserMapper } from './mappers';
-
 
 @Injectable()
 export class UsersService {
-
   public USER: number = 1;
   public fields = {
     id: true,
@@ -28,24 +25,23 @@ export class UsersService {
     deleted_at: true,
     rol: {
       id: true,
-      name: true
-    }
+      name: true,
+    },
   };
 
   constructor(
     @InjectRepository(User)
     private usersRepository: Repository<User>,
 
-    @InjectRepository(Rol)
-    private rolRepository: Repository<Rol>,
-
-  ) { }
+    @InjectRepository(Roles)
+    private rolesRepository: Repository<Roles>,
+  ) {}
 
   async userNameOrEmailExists(
     user_name: string,
     email: string,
     id: string = '',
-    itself: boolean = false
+    itself: boolean = false,
   ) {
     try {
       let query = this.usersRepository
@@ -61,18 +57,18 @@ export class UsersService {
       const previousRecord = await query.getOne();
       return previousRecord;
     } catch (error) {
-      throw error
+      throw error;
     }
   }
 
   async create(createUserDto: CreateUserDto) {
     const { user_name, email, rol_id } = createUserDto;
 
-    if (await this.userNameOrEmailExists(user_name, email) !== null) {
+    if ((await this.userNameOrEmailExists(user_name, email)) !== null) {
       throw new BadRequestException('user name or email already exists');
     }
 
-    const rolExists = await this.rolRepository.findOneBy({
+    const rolExists = await this.rolesRepository.findOneBy({
       id: rol_id,
       deleted_at: null,
     });
@@ -85,7 +81,9 @@ export class UsersService {
 
     return {
       message: 'user created successfully',
-      data: UserMapper(await this.usersRepository.save({ ...createUserDto, rol: rol_id }))
+      data: UserMapper(
+        await this.usersRepository.save({ ...createUserDto, rol: rol_id }),
+      ),
     };
   }
 
@@ -120,8 +118,6 @@ export class UsersService {
       throw error;
     }
   }
-
-
 
   async findOne(id: string) {
     try {
@@ -168,17 +164,22 @@ export class UsersService {
     try {
       const { user_name, email, rol_id } = updateUserDto;
 
-      const user = await this.usersRepository.findOneBy({ id, deleted_at: null });
+      const user = await this.usersRepository.findOneBy({
+        id,
+        deleted_at: null,
+      });
 
       if (!user) {
         throw new BadRequestException('user not found');
       }
 
-      if (await this.userNameOrEmailExists(user_name, email, id, true) !== null) {
+      if (
+        (await this.userNameOrEmailExists(user_name, email, id, true)) !== null
+      ) {
         throw new BadRequestException('user name or email already exists');
       }
 
-      const rolExists = await this.rolRepository.findOneBy({
+      const rolExists = await this.rolesRepository.findOneBy({
         id: updateUserDto.rol_id,
         deleted_at: null,
       });
@@ -187,22 +188,30 @@ export class UsersService {
         throw new BadRequestException('Rol not found');
       }
 
-      const updatedUser = await this.usersRepository.save({ ...user, ...updateUserDto, rol: rol_id });
+      const updatedUser = await this.usersRepository.save({
+        ...user,
+        ...updateUserDto,
+        rol: rol_id,
+      });
 
       return {
         message: 'user updated successfully',
-        data: await UserMapper(updatedUser)
+        data: await UserMapper(updatedUser),
       };
-
     } catch (error) {
-      throw error
+      throw error;
     }
   }
 
-
-  async updatePassword(id: string, UpdateUserPasswordDto: UpdateUserPasswordDto) {
+  async updatePassword(
+    id: string,
+    UpdateUserPasswordDto: UpdateUserPasswordDto,
+  ) {
     try {
-      const user = await this.usersRepository.findOneBy({ id, deleted_at: null });
+      const user = await this.usersRepository.findOneBy({
+        id,
+        deleted_at: null,
+      });
       if (!user) {
         throw new BadRequestException('user not found');
       }
@@ -216,13 +225,10 @@ export class UsersService {
       return {
         message: 'user updated successfully',
       };
-
-    }
-    catch (error) {
-      throw error
+    } catch (error) {
+      throw error;
     }
   }
-
 
   remove(id: string) {
     const user = this.usersRepository.findOneBy({ id, deleted_at: null });

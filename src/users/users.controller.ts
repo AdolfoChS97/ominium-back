@@ -13,13 +13,13 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UpdateUserPasswordDto } from './dto/update-userPassword';
 import { ApiQuery, ApiTags } from '@nestjs/swagger';
-import { PaginationQueryParamsDto } from 'src/shared/dtos/paginatio.dto';
-import { Order } from 'src/shared/dtos/paginatio.dto';
+import { PaginationQueryParamsDto } from 'src/shared/dtos/pagination.dto';
+import { Order } from 'src/shared/dtos/pagination.dto';
 
 @ApiTags('users')
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) { }
+  constructor(private readonly usersService: UsersService) {}
 
   @Post()
   create(@Body() createUserDto: CreateUserDto) {
@@ -56,8 +56,10 @@ export class UsersController {
   }
 
   @Patch(':id/change-password')
-  updatePassword(@Param('id') id: string, @Body() UpdateUserPasswordDto: UpdateUserPasswordDto,
-  ){
+  updatePassword(
+    @Param('id') id: string,
+    @Body() UpdateUserPasswordDto: UpdateUserPasswordDto,
+  ) {
     return this.usersService.updatePassword(id, UpdateUserPasswordDto);
   }
 

@@ -6,7 +6,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModule } from './users/users.module';
 import { DataSource } from 'typeorm';
 import { AuthModule } from './auth/auth.module';
-import { RolModule } from './rol/rol.module';
+import { RolesModule } from './roles/roles.module';
+import { ResourcesModule } from './resources/resources.module';
+import { PermissionsModule } from './permissions/permissions.module';
+import { CondominiumsModule } from './condominiums/condominiums.module';
 
 const configService = new ConfigService();
 
@@ -28,7 +31,10 @@ const configService = new ConfigService();
       synchronize: true,
     }),
     AuthModule,
-    RolModule,
+    RolesModule,
+    ResourcesModule,
+    CondominiumsModule,
+    // PermissionsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

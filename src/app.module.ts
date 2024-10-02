@@ -9,6 +9,7 @@ import { AuthModule } from './auth/auth.module';
 import { RolesModule } from './roles/roles.module';
 import { ResourcesModule } from './resources/resources.module';
 import { PermissionsModule } from './permissions/permissions.module';
+import { CondominiumsModule } from './condominiums/condominiums.module';
 
 const configService = new ConfigService();
 
@@ -32,6 +33,7 @@ const configService = new ConfigService();
     AuthModule,
     RolesModule,
     ResourcesModule,
+    CondominiumsModule,
     // PermissionsModule,
   ],
   controllers: [AppController],

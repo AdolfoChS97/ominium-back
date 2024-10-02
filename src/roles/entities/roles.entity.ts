@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString } from 'class-validator';
+import { IsOptional, IsString } from 'class-validator';
 import { User } from 'src/users/entities/user.entity';
 
 import {
@@ -10,21 +10,23 @@ import {
   Entity,
   DeleteDateColumn,
 } from 'typeorm';
+import { IRole } from '../interfaces/role.interface';
 
 @Entity({ name: 'Roles' })
-export class Roles {
+export class Roles implements IRole {
   @ApiProperty({ example: '1', description: 'Unique identifier' })
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ApiProperty({ example: 'user', description: 'Rol' })
+  @ApiProperty({ example: 'user', description: 'Role' })
   @IsString()
   @Column('varchar', { length: 50, nullable: false, unique: true })
-  rol: string;
+  name: string;
 
   @ApiProperty({ example: 'user', description: 'Description of rol' })
   @IsString()
-  @Column('varchar', { length: 50, nullable: false })
+  @IsOptional()
+  @Column('varchar', { length: 50, nullable: true, default: 'N/A' })
   description: string;
 
   @CreateDateColumn()

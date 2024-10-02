@@ -1,8 +1,8 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { CreateRolDto } from './dto/create-role.dto';
-import { UpdateRolDto } from './dto/update-role.dto';
+import { CreateRolDto } from '../dto/create-role.dto';
+import { UpdateRolDto } from '../dto/update-role.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Roles } from './entities/roles.entity';
+import { Roles } from '../entities/roles.entity';
 import { Not, Repository } from 'typeorm';
 
 @Injectable()
@@ -15,7 +15,7 @@ export class RolesService {
   async create(createRolDto: CreateRolDto) {
     try {
       const rolExists = await this.rolesRepository.findOneBy({
-        rol: createRolDto.rol,
+        name: createRolDto.name,
         deleted_at: null,
       });
       if (rolExists) {
@@ -57,7 +57,7 @@ export class RolesService {
       }
 
       const rolAlreadyExists = await this.rolesRepository.findOneBy({
-        rol,
+        name: rol,
         deleted_at: null,
         id: Not(id),
       });

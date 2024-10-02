@@ -2,11 +2,19 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
+import { SeederModule } from './shared/modules/seeder.module';
+import { Seeder } from './database/seeders/seeder';
 
 const PORT = process.env.PORT;
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  const context = await NestFactory.createApplicationContext(SeederModule);
+
+  const seeder = await context.get(Seeder);
+
+  await seeder.seed();
 
   app.useGlobalPipes(
     new ValidationPipe({

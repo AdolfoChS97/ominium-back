@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { RolesSeederService } from 'src/roles/services/roles.service.seeder';
+import { RolesSeederService } from 'src/modules/roles/services/roles.service.seeder';
 import { errorHandler } from 'src/shared/utils/error-handler';
 import { Logger } from '@nestjs/common';
 

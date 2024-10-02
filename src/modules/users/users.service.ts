@@ -3,11 +3,11 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UpdateUserPasswordDto } from './dto/update-userPassword';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from 'src/users/entities/user.entity';
+import { User } from '../users/entities/user.entity';
 import { Repository } from 'typeorm';
 import * as bcryptjs from 'bcryptjs';
 import { PaginationQueryParamsDto } from 'src/shared/dtos/pagination.dto';
-import { Roles } from 'src/roles/entities/roles.entity';
+import { Roles } from 'src/modules/roles/entities/roles.entity';
 import { UserMapper } from './mappers';
 
 @Injectable()

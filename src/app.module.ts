@@ -2,11 +2,11 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
-import { UsersModule } from './users/users.module';
+import { UsersModule } from './modules/users/users.module';
 import { DataSource } from 'typeorm';
-import { AuthModule } from './auth/auth.module';
-import { RolesModule } from './roles/modules/roles.module';
-import { ResourcesModule } from './resources/resources.module';
+import { AuthModule } from './modules/auth/auth.module';
+import { RolesModule } from './modules/roles/modules/roles.module';
+import { ResourcesModule } from './modules/resources/resources.module';
 import { SeederModule } from './shared/modules/seeder.module';
 import { PostgresDatabaseProviderModule } from './shared/modules/postgres-database-provider.module';
 

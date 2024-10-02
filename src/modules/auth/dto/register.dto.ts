@@ -1,5 +1,5 @@
 import { OmitType } from '@nestjs/swagger';
-import { User } from 'src/users/entities/user.entity';
+import { User } from '../../users/entities/user.entity';
 
 export class RegisterDto extends OmitType(User, [
   'id',

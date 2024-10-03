@@ -9,3 +9,4 @@ export class CreatePermissionDto extends OmitType(Permissions, [
   'updated_at',
   'deleted_at',
 ] as const) {}
+1

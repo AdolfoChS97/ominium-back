@@ -19,6 +19,7 @@ const configService = new ConfigService();
       password: configService.get('DB_PASSWORD'),
       database: configService.get('DB_NAME'),
       synchronize: true,
+      autoLoadEntities: true,
     }),
     ResourcesModule,
     PermissionsModule,

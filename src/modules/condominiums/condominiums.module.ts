@@ -5,7 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Condominium } from './entities/condominium.entity';
 
 @Module({
-  imports :[TypeOrmModule.forFeature([Condominium])],
+  imports: [TypeOrmModule.forFeature([Condominium])],
   controllers: [CondominiumsController],
   providers: [CondominiumsService],
 })

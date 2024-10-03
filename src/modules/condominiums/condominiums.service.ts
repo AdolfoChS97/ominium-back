@@ -8,15 +8,15 @@ import { PaginationQueryParamsDto } from 'src/shared/dtos/pagination.dto';
 
 @Injectable()
 export class CondominiumsService {
-
   constructor(
     @InjectRepository(Condominium)
     private readonly condominiumsRepository: Repository<Condominium>,
-  ) { }
+  ) {}
 
   async create(createCondominiumDto: CreateCondominiumDto) {
     try {
-      const condominium = this.condominiumsRepository.create(createCondominiumDto);
+      const condominium =
+        this.condominiumsRepository.create(createCondominiumDto);
       await this.condominiumsRepository.save(condominium);
       return condominium;
     } catch (error) {
@@ -36,12 +36,12 @@ export class CondominiumsService {
         take: pageSize,
         order: { created_at: sort || 'DESC' },
         where: { deleted_at: null },
-      })
+      });
 
       return {
         data: data,
         total: data.length,
-      }
+      };
     } catch (error) {
       throw error;
     }
@@ -52,13 +52,13 @@ export class CondominiumsService {
       const condominiumId = await this.condominiumsRepository.findOneBy({
         id: id,
         deleted_at: null,
-      })
+      });
 
       if (!condominiumId) {
         throw new Error('condominium not found');
       }
 
-      return condominiumId
+      return condominiumId;
     } catch (error) {
       throw error;
     }
@@ -69,18 +69,19 @@ export class CondominiumsService {
       const condominium = await this.condominiumsRepository.findOneBy({
         id,
         deleted_at: null,
-      })
+      });
 
-      if(!condominium) {
+      if (!condominium) {
         throw new Error('condominium not found');
       }
 
       return {
         message: 'Condominium updated successfully',
-        data: await this.condominiumsRepository.save({ ...condominium, ...updateCondominiumDto }),
-      }
-
-
+        data: await this.condominiumsRepository.save({
+          ...condominium,
+          ...updateCondominiumDto,
+        }),
+      };
     } catch (error) {
       throw error;
     }
@@ -97,12 +98,14 @@ export class CondominiumsService {
         throw new Error('condominium not found');
       }
 
-      await this.condominiumsRepository.save({ ...condominium, deleted_at: new Date() })
+      await this.condominiumsRepository.save({
+        ...condominium,
+        deleted_at: new Date(),
+      });
 
       return {
         message: 'Condominium deleted successfully',
-
-      }
+      };
     } catch (error) {
       throw error;
     }

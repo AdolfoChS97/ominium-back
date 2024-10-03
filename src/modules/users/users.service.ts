@@ -35,7 +35,7 @@ export class UsersService {
 
     @InjectRepository(Roles)
     private rolesRepository: Repository<Roles>,
-  ) { }
+  ) {}
 
   async userNameOrEmailExists(
     user_name: string,
@@ -156,23 +156,21 @@ export class UsersService {
       .createQueryBuilder('user')
       .leftJoinAndSelect('user.role', 'role') // Usamos leftJoinAndSelect para obtener automáticamente los datos relacionados
       .select([
-        'user.id',         // Lista explícita de columnas
+        'user.id', // Lista explícita de columnas
         'user.name',
         'user.last_name',
         'user.user_name',
         'user.email',
         'user.created_at',
         'user.updated_at',
-        'role.id',         // Selección de las columnas de la tabla roles
+        'role.id', // Selección de las columnas de la tabla roles
         'role.name',
         withPassword ? 'user.password' : '',
       ])
       .where('user.user_name = :user_name', { user_name })
       .andWhere('user.deleted_at IS NULL')
-      .getOne();  
+      .getOne();
   }
-  
-
 
   findOneByEmail(email: string) {
     return this.usersRepository.findOneBy({ email: email });

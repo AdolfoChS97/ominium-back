@@ -1,9 +1,21 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Query,
+} from '@nestjs/common';
 import { CondominiumsService } from './condominiums.service';
 import { CreateCondominiumDto } from './dto/create-condominium.dto';
 import { UpdateCondominiumDto } from './dto/update-condominium.dto';
 import { ApiQuery, ApiTags } from '@nestjs/swagger';
-import { Order, PaginationQueryParamsDto } from 'src/shared/dtos/pagination.dto';
+import {
+  Order,
+  PaginationQueryParamsDto,
+} from 'src/shared/dtos/pagination.dto';
 
 @ApiTags('Condominiums')
 @Controller('condominiums')
@@ -23,13 +35,13 @@ export class CondominiumsController {
     @Query() { pageNumber, pageSize, sort }: PaginationQueryParamsDto,
   ) {
     try {
-    const data = await this.condominiumsService.findAll({
-      pageNumber: pageNumber,
-      pageSize: pageSize,
-      sort: sort,
-    })
+      const data = await this.condominiumsService.findAll({
+        pageNumber: pageNumber,
+        pageSize: pageSize,
+        sort: sort,
+      });
 
-    return data
+      return data;
     } catch (error) {
       throw error;
     }
@@ -45,11 +57,13 @@ export class CondominiumsController {
   }
 
   @Patch('/:id')
-  update(@Param('id') id: string, @Body() updateCondominiumDto: UpdateCondominiumDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateCondominiumDto: UpdateCondominiumDto,
+  ) {
     try {
       return this.condominiumsService.update(id, updateCondominiumDto);
     } catch (error) {
-      
       throw error;
     }
   }

@@ -32,6 +32,7 @@ export class Permissions implements IPermission {
     description: 'Permission description',
   })
   @IsString()
+  @IsOptional()
   @Transform(({ value }) => value.trim())
   @Column('varchar', { length: 50, nullable: true, default: 'N/A' })
   description: string;

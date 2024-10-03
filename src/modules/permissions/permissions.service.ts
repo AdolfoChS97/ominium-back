@@ -1,5 +1,9 @@
 import { Repository } from 'typeorm';
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Permissions } from './entities/permissions.entity';
 import { errorHandler } from 'src/shared/utils/error-handler';
@@ -25,7 +29,7 @@ export class PermissionsService {
     try {
       const p = await this.getOneBy('name', permission.name);
       if (p) {
-        throw new Error('Permission already exists');
+        throw new BadRequestException('Permission already exists');
       }
       return await this.permissionsRepository.save(permission);
     } catch (e) {
@@ -39,6 +43,13 @@ export class PermissionsService {
       if (!p) {
         throw new NotFoundException('Permission not found');
       }
+
+      const previous = await this.permissionExists(permission.name, id, true);
+
+      if (previous) {
+        throw new BadRequestException('Permission already exists');
+      }
+
       const updated = await this.permissionsRepository.save({
         id: p.id,
         updated_at: new Date(),
@@ -118,6 +129,29 @@ export class PermissionsService {
       return PermissionMapper(deleted, 'Permission deleted successfully');
     } catch (e) {
       errorHandler(e);
+    }
+  }
+
+  async permissionExists(
+    name: string,
+    id: string = '',
+    itself: boolean = false,
+  ) {
+    try {
+      let query = this.permissionsRepository
+        .createQueryBuilder('permissions')
+        .select(['permissions.name'])
+        .where('permissions.name = :name', { name })
+        .where('permissions.deleted_at is null');
+
+      if (itself) {
+        query = query.andWhere('permissions.id != :id', { id });
+      }
+
+      const previousRecord = await query.getOne();
+      return previousRecord;
+    } catch (error) {
+      throw error;
     }
   }
 }

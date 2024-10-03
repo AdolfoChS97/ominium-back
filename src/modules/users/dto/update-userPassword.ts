@@ -11,7 +11,7 @@ export class UpdateUserPasswordDto extends OmitType(User, [
   'created_at',
   'updated_at',
   'deleted_at',
-  'rol',
+  'role',
   'user_name',
 ]) {
   @IsString()

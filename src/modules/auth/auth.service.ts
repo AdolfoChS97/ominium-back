@@ -31,7 +31,7 @@ export class AuthService {
     if (emailExists) {
       throw new BadRequestException('email already exists');
     }
-    const registerUser = { ...registerDto, rol: this.usersService.USER };
+    const registerUser = { ...registerDto, role: this.usersService.USER };
 
     return await this.usersService.create(registerUser);
   }
@@ -58,6 +58,6 @@ export class AuthService {
       expiresIn: this.configService.get('JWT_TIME_EXPI'),
     });
 
-    return { token, user_name, rol: user.rol };
+    return { token, user_name, rol: user.role };
   }
 }

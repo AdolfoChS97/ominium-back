@@ -4,7 +4,7 @@ import { User } from '../entities/user.entity';
 
 export class UpdateUserDto extends OmitType(User, [
   'id',
-  'rol',
+  'role',
   'password',
   'created_at',
   'updated_at',

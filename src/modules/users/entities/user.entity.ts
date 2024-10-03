@@ -66,7 +66,7 @@ export class User {
   @ManyToOne(() => Roles, (rol) => rol.user, {
     eager: true,
   })
-  rol: Roles | number;
+  role: Roles | number;
 
   @CreateDateColumn()
   created_at: Date;

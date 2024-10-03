@@ -62,14 +62,14 @@ export class UsersService {
   }
 
   async create(createUserDto: CreateUserDto) {
-    const { user_name, email, rol } = createUserDto;
+    const { user_name, email, role } = createUserDto;
 
     if ((await this.userNameOrEmailExists(user_name, email)) !== null) {
       throw new BadRequestException('user name or email already exists');
     }
 
     const rolExists = await this.rolesRepository.findOneBy({
-      name: rol,
+      name: role,
       deleted_at: null,
     });
 
@@ -84,7 +84,7 @@ export class UsersService {
       data: UserMapper(
         await this.usersRepository.save({
           ...createUserDto,
-          rol: rolExists.id,
+          role: rolExists.id,
         }),
       ),
     };

@@ -4,12 +4,12 @@ import { IsNumber } from 'class-validator';
 
 export class CreateUserDto extends OmitType(User, [
   'id',
-  'rol',
+  'role',
   'created_at',
   'deleted_at',
   'updated_at',
 ]) {
   @ApiProperty({ example: '1', description: 'User rol' })
   @IsNumber()
-  rol: string;
+  role: string;
 }

@@ -38,6 +38,6 @@ export class Roles implements IRole {
   @DeleteDateColumn({ nullable: true, default: null })
   deleted_at: Date;
 
-  @OneToMany(() => User, (user) => user.rol, {})
+  @OneToMany(() => User, (user) => user.role, {})
   user: User[];
 }

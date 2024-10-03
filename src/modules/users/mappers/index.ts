@@ -9,7 +9,7 @@ export const UserMapper = (user: User): UserDto => {
     name: user.name,
     last_name: user.last_name,
     phone_number: user.phone_number,
-    rol_id: user.rol as number,
+    role: user.role as number,
     created_at: user.created_at,
     updated_at: user.updated_at,
   };

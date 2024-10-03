@@ -3,16 +3,19 @@ import { IsBoolean, IsOptional, IsString } from 'class-validator';
 import { Transform } from 'class-transformer';
 import {
   Column,
+  CreateDateColumn,
+  DeleteDateColumn,
   Entity,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 import { Resources } from 'src/modules/resources/entities/resources.entity';
 import { Roles } from 'src/modules/roles/entities/roles.entity';
 import { IPermission } from '../interfaces/permission.interface';
 
-@Entity({ name: 'permissions' })
+@Entity({ name: 'Permissions' })
 export class Permissions implements IPermission {
   @ApiProperty({ example: 'UUID', description: 'Unique identifier' })
   @PrimaryGeneratedColumn('uuid')
@@ -56,4 +59,13 @@ export class Permissions implements IPermission {
 
   @ManyToOne(() => Roles, (role) => role.permissions)
   role: Roles;
+
+  @CreateDateColumn()
+  created_at: Date;
+
+  @UpdateDateColumn()
+  updated_at: Date;
+
+  @DeleteDateColumn({ nullable: true, default: null })
+  deleted_at: Date;
 }

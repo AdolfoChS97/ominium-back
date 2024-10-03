@@ -94,7 +94,7 @@ export class UsersService {
     try {
       const query = this.usersRepository
         .createQueryBuilder('user')
-        .leftJoinAndSelect('user.rol', 'roles')
+        .leftJoinAndSelect('user.role', 'roles')
         .select([
           'user.id',
           'user.name',

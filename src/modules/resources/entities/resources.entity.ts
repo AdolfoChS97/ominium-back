@@ -20,6 +20,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { Permissions } from '../../permissions/entities/permissions.entity';
 
 @Entity({ name: 'Resources' })
 export class Resources {
@@ -68,6 +69,9 @@ export class Resources {
   @Transform(({ value }) => Number(value))
   @Column('int', { nullable: true, default: null })
   order: number;
+
+  @ManyToOne(() => Permissions, (permission) => permission.resources)
+  permission: Permissions;
 
   @CreateDateColumn()
   @IsOptional()

@@ -220,6 +220,7 @@ export class ResourcesService {
       children: null,
       route: null,
       order: null,
+      permission: null,
       since: moment().format('DD-MM-YYYY'),
       until: moment().add(1, 'd').format('DD-MM-YYYY'),
     },

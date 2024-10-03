@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsOptional, IsString } from 'class-validator';
 import { User } from '../../users/entities/user.entity';
-
+import { Permissions } from '../../permissions/entities/permissions.entity';
 import {
   Column,
   CreateDateColumn,
@@ -40,4 +40,7 @@ export class Roles implements IRole {
 
   @OneToMany(() => User, (user) => user.role, {})
   user: User[];
+
+  @OneToMany(() => Permissions, (permission) => permission.role)
+  permissions: Permissions[];
 }

@@ -20,9 +20,9 @@ export class AuthController {
   @Post('register')
   register(
     @Body()
-    registerDto: RegisterDto,
+    user: RegisterDto,
   ) {
-    return this.authService.register(registerDto);
+    return this.authService.register(user);
   }
 
   @ApiBody({
@@ -33,8 +33,8 @@ export class AuthController {
   @Post('login')
   login(
     @Body()
-    loginDto: LoginDto,
+    credentials: LoginDto,
   ) {
-    return this.authService.login(loginDto);
+    return this.authService.login(credentials);
   }
 }

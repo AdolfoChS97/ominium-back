@@ -9,6 +9,7 @@ import * as bcryptjs from 'bcryptjs';
 import { LoginDto } from './dto/login.dto';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import { Roles } from '../roles/entities/roles.entity';
 
 @Injectable()
 export class AuthService {
@@ -20,11 +21,8 @@ export class AuthService {
 
   async register(registerDto: RegisterDto) {
     const { user_name, email } = registerDto;
-
     const userNameExists = await this.usersService.findOneByUserName(user_name);
-
     const emailExists = await this.usersService.findOneByEmail(email);
-
     if (userNameExists) {
       throw new BadRequestException('user name already exists');
     }
@@ -32,13 +30,11 @@ export class AuthService {
       throw new BadRequestException('email already exists');
     }
     const registerUser = { ...registerDto, role: this.usersService.USER };
-
     return await this.usersService.create(registerUser);
   }
 
   async login({ user_name, password }: LoginDto) {
-    const user = await this.usersService.findOneByUserName(user_name);
-
+    const user = await this.usersService.findOneByUserName(user_name, true);
     if (!user) {
       throw new UnauthorizedException('user not found');
     }
@@ -49,8 +45,14 @@ export class AuthService {
       throw new UnauthorizedException('invalid password');
     }
 
+    const role = user.role as unknown as Roles;
+
     const payload = {
+      id: user.id,
       user_name: user.user_name,
+      email: user.email,
+      role_id: role.id,
+      role_name: role.name,
     };
 
     const token = await this.jwtService.sign(payload, {
@@ -58,6 +60,6 @@ export class AuthService {
       expiresIn: this.configService.get('JWT_TIME_EXPI'),
     });
 
-    return { token, user_name, rol: user.role };
+    return { token };
   }
 }

@@ -35,7 +35,7 @@ export class UsersService {
 
     @InjectRepository(Roles)
     private rolesRepository: Repository<Roles>,
-  ) {}
+  ) { }
 
   async userNameOrEmailExists(
     user_name: string,
@@ -104,7 +104,7 @@ export class UsersService {
           'user.created_at',
           'user.updated_at',
           'roles.id',
-          'roles.rol',
+          'roles.name',
         ])
         .where('user.deleted_at IS NULL')
         .orderBy('user.created_at', sort || 'DESC')
@@ -126,7 +126,7 @@ export class UsersService {
     try {
       const userQuery = this.usersRepository
         .createQueryBuilder('user')
-        .leftJoinAndSelect('user.rol', 'roles')
+        .leftJoinAndSelect('user.role', 'roles')
         .select([
           'user.id',
           'user.name',
@@ -151,13 +151,28 @@ export class UsersService {
       throw error;
     }
   }
-
-  findOneByUserName(username: string) {
-    return this.usersRepository.findOneBy({
-      user_name: username,
-      deleted_at: null,
-    });
+  async findOneByUserName(user_name: string, withPassword = false) {
+    return await this.usersRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.role', 'role') // Usamos leftJoinAndSelect para obtener automáticamente los datos relacionados
+      .select([
+        'user.id',         // Lista explícita de columnas
+        'user.name',
+        'user.last_name',
+        'user.user_name',
+        'user.email',
+        'user.created_at',
+        'user.updated_at',
+        'role.id',         // Selección de las columnas de la tabla roles
+        'role.name',
+        withPassword ? 'user.password' : '',
+      ])
+      .where('user.user_name = :user_name', { user_name })
+      .andWhere('user.deleted_at IS NULL')
+      .getOne();  
   }
+  
+
 
   findOneByEmail(email: string) {
     return this.usersRepository.findOneBy({ email: email });

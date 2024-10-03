@@ -62,8 +62,8 @@ export class User {
 
   @ApiProperty({ example: '1', description: 'User rol' })
   @IsNumber()
-  @JoinColumn({ name: 'rol' })
-  @ManyToOne(() => Roles, (rol) => rol.user, {
+  @JoinColumn({ name: 'role' })
+  @ManyToOne(() => Roles, (role) => role.user, {
     eager: true,
   })
   role: Roles | number;

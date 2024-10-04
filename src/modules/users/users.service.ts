@@ -69,9 +69,10 @@ export class UsersService {
     }
 
     const rolExists = await this.rolesRepository.findOneBy({
-      name: role,
+      id: role,
       deleted_at: null,
     });
+
 
     if (!rolExists) {
       throw new BadRequestException('Rol not found');
@@ -88,6 +89,7 @@ export class UsersService {
         }),
       ),
     };
+    
   }
 
   async findAll({ pageNumber, pageSize, sort }: PaginationQueryParamsDto) {
@@ -200,9 +202,9 @@ export class UsersService {
         deleted_at: null,
       });
 
-      if (!rolExists) {
-        throw new BadRequestException('Rol not found');
-      }
+      // if (!rolExists) {
+      //   throw new BadRequestException('Rol not found');
+      // }
 
       const updatedUser = await this.usersRepository.save({
         ...user,

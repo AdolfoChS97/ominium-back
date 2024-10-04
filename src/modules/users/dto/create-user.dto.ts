@@ -1,6 +1,6 @@
 import { ApiProperty, OmitType } from '@nestjs/swagger';
 import { User } from '../entities/user.entity';
-import { IsNumber } from 'class-validator';
+import { IsNumber, IsString } from 'class-validator';
 
 export class CreateUserDto extends OmitType(User, [
   'id',
@@ -9,7 +9,7 @@ export class CreateUserDto extends OmitType(User, [
   'deleted_at',
   'updated_at',
 ]) {
-  @ApiProperty({ example: '1', description: 'User rol' })
-  @IsNumber()
+  @ApiProperty({ example: '3f5b002c-cf32-425c-a60d-2dad6c9f8b7c', description: 'User rol' })
+  @IsString()
   role: string;
 }

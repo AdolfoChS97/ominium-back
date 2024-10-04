@@ -60,13 +60,13 @@ export class User {
   @Column({ nullable: false })
   password: string;
 
-  @ApiProperty({ example: '1', description: 'User rol' })
+  @ApiProperty({ example: '3f5b002c-cf32-425c-a60d-2dad6c9f8b7c', description: 'User rol' })
   @IsNumber()
   @JoinColumn({ name: 'role' })
   @ManyToOne(() => Roles, (role) => role.user, {
     eager: true,
   })
-  role: Roles | number;
+  role: Roles | string;
 
   @CreateDateColumn()
   created_at: Date;

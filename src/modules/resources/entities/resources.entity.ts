@@ -15,6 +15,7 @@ import {
   DeleteDateColumn,
   Entity,
   JoinColumn,
+  ManyToMany,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
@@ -70,9 +71,6 @@ export class Resources {
   @Column('int', { nullable: true, default: null })
   order: number;
 
-  @ManyToOne(() => Permissions, (permission) => permission.resources)
-  permission: Permissions;
-
   @CreateDateColumn()
   @IsOptional()
   @IsDateString()
@@ -87,4 +85,7 @@ export class Resources {
   @IsOptional()
   @IsDateString()
   deleted_at: Date;
+
+  @ManyToMany(() => Permissions, (permission) => permission.resources)
+  permission: Permissions;
 }

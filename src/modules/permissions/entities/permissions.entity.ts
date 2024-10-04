@@ -6,8 +6,9 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  JoinTable,
+  ManyToMany,
   ManyToOne,
-  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -55,12 +56,6 @@ export class Permissions implements IPermission {
   @Column('boolean', { default: false })
   write?: boolean;
 
-  @OneToMany(() => Resources, (resource) => resource.permission)
-  resources: Resources[];
-
-  @ManyToOne(() => Roles, (role) => role.permissions)
-  role: Roles;
-
   @CreateDateColumn()
   created_at: Date;
 
@@ -69,4 +64,11 @@ export class Permissions implements IPermission {
 
   @DeleteDateColumn({ nullable: true, default: null })
   deleted_at: Date;
+
+  @ManyToMany(() => Resources, (resource) => resource.permission)
+  @JoinTable()
+  resources: Resources[];
+
+  @ManyToOne(() => Roles, (role) => role.permissions)
+  role: Roles;
 }

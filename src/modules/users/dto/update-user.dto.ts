@@ -1,8 +1,8 @@
 import { ApiProperty, OmitType } from '@nestjs/swagger';
 import { IsNumber } from 'class-validator';
-import { User } from '../entities/user.entity';
+import { Users } from '../entities/users.entity';
 
-export class UpdateUserDto extends OmitType(User, [
+export class UpdateUserDto extends OmitType(Users, [
   'id',
   'role',
   'password',

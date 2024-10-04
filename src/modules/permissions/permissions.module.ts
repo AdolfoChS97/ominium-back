@@ -18,5 +18,10 @@ import { ResourcesToPermissionsService } from './services/resources-to-permissio
     ResourcesService,
     ResourcesToPermissionsService,
   ],
+  exports: [
+    PermissionsService,
+    ResourcesToPermissionsService,
+    ResourcesService,
+  ],
 })
 export class PermissionsModule {}

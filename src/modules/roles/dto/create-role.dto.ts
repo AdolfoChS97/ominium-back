@@ -7,4 +7,5 @@ export class CreateRolDto extends OmitType(Roles, [
   'updated_at',
   'deleted_at',
   'user',
+  'permissions',
 ]) {}

@@ -15,7 +15,7 @@ import {
 } from 'typeorm';
 
 @Entity({ name: 'Users' })
-export class User {
+export class Users {
   @ApiProperty({ example: '1', description: 'Unique identifier' })
   @PrimaryGeneratedColumn('uuid')
   id: string;

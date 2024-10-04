@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsOptional, IsString } from 'class-validator';
-import { User } from '../../users/entities/user.entity';
+import { Users } from '../../users/entities/users.entity';
 import { Permissions } from '../../permissions/entities/permissions.entity';
 import {
   Column,
@@ -38,8 +38,8 @@ export class Roles implements IRole {
   @DeleteDateColumn({ nullable: true, default: null })
   deleted_at: Date;
 
-  @OneToMany(() => User, (user) => user.role, {})
-  user: User[];
+  @OneToMany(() => Users, (user) => user.role, {})
+  user: Users[];
 
   @OneToMany(() => Permissions, (permission) => permission.role)
   permissions: Permissions[];

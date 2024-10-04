@@ -5,24 +5,28 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Permissions } from './entities/permissions.entity';
+import { Permissions } from '../entities/permissions.entity';
 import { errorHandler } from 'src/shared/utils/error-handler';
-import { CreatePermissionDto } from './dtos/create-permission.dto';
-import { PermissionMapper } from './mappers/permission.mapper';
-import { UpdatePermissionDto } from './dtos/update-permission.dto';
-import { PermissionsFiltersDto } from './dtos/permission-filters.dto';
+import { CreatePermissionDto } from '../dtos/create-permission.dto';
+import { PermissionMapper } from '../mappers/permission.mapper';
+import { UpdatePermissionDto } from '../dtos/update-permission.dto';
+import { PermissionsFiltersDto } from '../dtos/permission-filters.dto';
 import {
   Order,
   PaginationQueryParamsDto,
 } from 'src/shared/dtos/pagination.dto';
 import * as moment from 'moment';
+import { ResourcesService } from '../../resources/resources.service';
 import { queryParamsHandler } from 'src/shared/utils/query-params-handler';
+import { ResourcesToPermissionsService } from './resources-to-permissions.service';
 
 @Injectable()
 export class PermissionsService {
   constructor(
     @InjectRepository(Permissions)
     private readonly permissionsRepository: Repository<Permissions>,
+    private readonly resourcesService: ResourcesService,
+    private readonly resourcesToPermissionsService: ResourcesToPermissionsService,
   ) {}
 
   async create(permission: CreatePermissionDto) {
@@ -152,6 +156,79 @@ export class PermissionsService {
       return previousRecord;
     } catch (error) {
       throw error;
+    }
+  }
+
+  async assign(id: string, resourceId: string) {
+    try {
+      const [p, r] = await (
+        await Promise.allSettled([
+          await this.getOneBy('id', id),
+          await this.resourcesService.getOneBy('id', resourceId),
+        ])
+      ).map((p: PromiseSettledResult<Awaited<any>>) => {
+        const { status } = p;
+        if (status === 'fulfilled') return p?.value;
+        return null;
+      }, []);
+
+      if (!p || !r) {
+        throw new BadRequestException(
+          'We could not assign a resource to a null',
+        );
+      }
+
+      const isAlreadyAssigned = await this.resourcesToPermissionsService.check(
+        r.id,
+        p.id,
+      );
+
+      if (isAlreadyAssigned) {
+        throw new BadRequestException(
+          'We could not reassign this resource to this permission',
+        );
+      }
+
+      return await this.resourcesToPermissionsService.create(r.id, p.id);
+    } catch (e) {
+      errorHandler(e);
+    }
+  }
+
+  async unassign(id: string, resourceId: string) {
+    try {
+      const [p, r] = await (
+        await Promise.allSettled([
+          await this.getOneBy('id', id),
+          await this.resourcesService.getOneBy('id', resourceId),
+        ])
+      ).map((p: PromiseSettledResult<Awaited<any>>) => {
+        console.log(p);
+        const { status } = p;
+        if (status === 'fulfilled') return p?.value;
+        return null;
+      }, []);
+
+      if (!p || !r) {
+        throw new BadRequestException(
+          'We could not unassign a resource to a null',
+        );
+      }
+
+      const hasAssigned = await this.resourcesToPermissionsService.check(
+        r.id,
+        p.id,
+      );
+
+      if (!hasAssigned) {
+        throw new BadRequestException(
+          'We could not unassign this resource to this permission because it is not assigned',
+        );
+      }
+
+      return await this.resourcesToPermissionsService.delete(hasAssigned.id);
+    } catch (e) {
+      errorHandler(e);
     }
   }
 }

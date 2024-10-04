@@ -3,7 +3,6 @@ import { Permissions } from '../entities/permissions.entity';
 
 export class UpdatePermissionDto extends OmitType(Permissions, [
   'id',
-  'resources',
   'role',
   'created_at',
   'updated_at',

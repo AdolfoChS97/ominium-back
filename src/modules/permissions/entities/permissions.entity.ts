@@ -9,12 +9,14 @@ import {
   JoinTable,
   ManyToMany,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { Resources } from 'src/modules/resources/entities/resources.entity';
 import { Roles } from 'src/modules/roles/entities/roles.entity';
 import { IPermission } from '../interfaces/permission.interface';
+import { ResourcesToPermissions } from 'src/modules/resources/entities/resources-to-permissions.entity';
 
 @Entity({ name: 'Permissions' })
 export class Permissions implements IPermission {
@@ -65,9 +67,11 @@ export class Permissions implements IPermission {
   @DeleteDateColumn({ nullable: true, default: null })
   deleted_at: Date;
 
-  @ManyToMany(() => Resources, (resource) => resource.permission)
-  @JoinTable()
-  resources: Resources[];
+  @OneToMany(
+    () => ResourcesToPermissions,
+    (resourcesToPermissions) => resourcesToPermissions.permissionId,
+  )
+  resourcesToPermissions: ResourcesToPermissions[];
 
   @ManyToOne(() => Roles, (role) => role.permissions)
   role: Roles;

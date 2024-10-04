@@ -15,13 +15,12 @@ import {
   DeleteDateColumn,
   Entity,
   JoinColumn,
-  ManyToMany,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Permissions } from '../../permissions/entities/permissions.entity';
+import { ResourcesToPermissions } from './resources-to-permissions.entity';
 
 @Entity({ name: 'Resources' })
 export class Resources {
@@ -86,6 +85,9 @@ export class Resources {
   @IsDateString()
   deleted_at: Date;
 
-  @ManyToMany(() => Permissions, (permission) => permission.resources)
-  permission: Permissions;
+  @OneToMany(
+    () => ResourcesToPermissions,
+    (resourcesToPermissions) => resourcesToPermissions.resourceId,
+  )
+  resourcesToPermissions: ResourcesToPermissions[];
 }

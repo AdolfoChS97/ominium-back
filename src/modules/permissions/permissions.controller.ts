@@ -8,7 +8,7 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
-import { PermissionsService } from './permissions.service';
+import { PermissionsService } from './services/permissions.service';
 import { ApiBody, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { CreatePermissionDto } from './dtos/create-permission.dto';
 import { UpdatePermissionDto } from './dtos/update-permission.dto';
@@ -191,5 +191,41 @@ export class PermissionsController {
   @Delete(':id')
   async remove(@Param('id') id: string) {
     return await this.permissionsService.delete(id);
+  }
+
+  @ApiParam({
+    name: 'id',
+    type: String,
+    description: 'Permission id (UUID)',
+  })
+  @ApiParam({
+    name: 'resourceId',
+    type: String,
+    description: 'Resource id (UUID)',
+  })
+  @Post(':id/assign/:resourceId')
+  async assign(
+    @Param('id') id: string,
+    @Param('resourceId') resourceId: string,
+  ) {
+    return await this.permissionsService.assign(id, resourceId);
+  }
+
+  @ApiParam({
+    name: 'id',
+    type: String,
+    description: 'Permission id (UUID)',
+  })
+  @ApiParam({
+    name: 'resourceId',
+    type: String,
+    description: 'Resource id (UUID)',
+  })
+  @Post(':id/unassign/:resourceId')
+  async unassign(
+    @Param('id') id: string,
+    @Param('resourceId') resourceId: string,
+  ) {
+    return await this.permissionsService.unassign(id, resourceId);
   }
 }

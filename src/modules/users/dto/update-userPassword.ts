@@ -1,8 +1,8 @@
 import { OmitType } from '@nestjs/swagger';
 import { IsString, MinLength } from 'class-validator';
-import { User } from '../entities/user.entity';
+import { Users } from '../entities/users.entity';
 
-export class UpdateUserPasswordDto extends OmitType(User, [
+export class UpdateUserPasswordDto extends OmitType(Users, [
   'id',
   'name',
   'last_name',

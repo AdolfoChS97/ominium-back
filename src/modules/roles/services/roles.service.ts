@@ -4,12 +4,15 @@ import { UpdateRolDto } from '../dto/update-role.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Roles } from '../entities/roles.entity';
 import { Not, Repository } from 'typeorm';
+import { errorHandler } from 'src/shared/utils/error-handler';
+import { PermissionsService } from 'src/modules/permissions/services/permissions.service';
 
 @Injectable()
 export class RolesService {
   constructor(
     @InjectRepository(Roles)
     private readonly rolesRepository: Repository<Roles>,
+    private readonly permissionService: PermissionsService,
   ) {}
 
   async create(createRolDto: CreateRolDto) {
@@ -88,6 +91,33 @@ export class RolesService {
       };
     } catch (error) {
       throw error;
+    }
+  }
+
+  async getOneBy(param: 'name' | 'id', value: string) {
+    try {
+      const p = await this.rolesRepository
+        .createQueryBuilder('roles')
+        .where(`roles.${param} = :${param}`, { [param]: value })
+        .getOne();
+      return p;
+    } catch (e) {
+      errorHandler(e);
+    }
+  }
+
+  async assign(id: string, permissionId: string) {
+    try {
+      const r = await this.getOneBy('id', id);
+      const p = await this.getOneBy('id', permissionId);
+      if (!r || !p)
+        throw new BadRequestException(
+          'We couldnt find the role or permission you are trying to assign',
+        );
+
+      
+    } catch (e) {
+      errorHandler(e);
     }
   }
 }

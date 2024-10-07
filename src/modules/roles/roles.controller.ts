@@ -10,7 +10,7 @@ import {
 import { RolesService } from './services/roles.service';
 import { CreateRolDto } from './dto/create-role.dto';
 import { UpdateRolDto } from './dto/update-role.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiParam, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('roles')
 @Controller('roles')
@@ -40,5 +40,12 @@ export class RolesController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.rolesService.remove(id);
+  }
+
+  @ApiParam({ name: 'Role id', required: true, type: String })
+  @ApiParam({ name: 'Permission id', required: true, type: String })
+  @Post(':id/assign/:permissionId')
+  assign(@Param('id') id: string, @Param('permissionId') permissionId: string) {
+    return this.rolesService.assign(id, permissionId);
   }
 }

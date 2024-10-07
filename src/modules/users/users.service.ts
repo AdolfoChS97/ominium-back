@@ -3,12 +3,13 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UpdateUserPasswordDto } from './dto/update-userPassword';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from '../users/entities/user.entity';
+import { Users } from './entities/users.entity';
 import { Repository } from 'typeorm';
 import * as bcryptjs from 'bcryptjs';
 import { PaginationQueryParamsDto } from 'src/shared/dtos/pagination.dto';
 import { Roles } from 'src/modules/roles/entities/roles.entity';
 import { UserMapper } from './mappers';
+import { errorHandler } from 'src/shared/utils/error-handler';
 
 @Injectable()
 export class UsersService {
@@ -30,8 +31,8 @@ export class UsersService {
   };
 
   constructor(
-    @InjectRepository(User)
-    private usersRepository: Repository<User>,
+    @InjectRepository(Users)
+    private usersRepository: Repository<Users>,
 
     @InjectRepository(Roles)
     private rolesRepository: Repository<Roles>,
@@ -62,33 +63,40 @@ export class UsersService {
   }
 
   async create(createUserDto: CreateUserDto) {
-    const { user_name, email, role } = createUserDto;
+    try {
+      const { user_name, email, role } = createUserDto;
 
-    if ((await this.userNameOrEmailExists(user_name, email)) !== null) {
-      throw new BadRequestException('user name or email already exists');
+
+    
+      if ((await this.userNameOrEmailExists(user_name, email)) !== null) {
+        throw new BadRequestException('user name or email already exists');
+      }
+
+      const rolExists = await this.rolesRepository.findOneBy({
+        id: role,
+        deleted_at: null,
+      });
+
+      if (!rolExists) {
+        throw new BadRequestException('Rol not found');
+      }
+
+      createUserDto.password = await bcryptjs.hash(createUserDto.password, 10);
+
+    
+      return {
+        message: 'user created successfully',
+        data: UserMapper(
+          await this.usersRepository.save({
+            ...createUserDto,
+            role: rolExists.id,
+          }),
+        ),
+      };
+    } catch (e) {
+      throw e;
+      errorHandler(e);
     }
-
-    const rolExists = await this.rolesRepository.findOneBy({
-      id: role,
-      deleted_at: null,
-    });
-
-
-    if (!rolExists) {
-      throw new BadRequestException('Rol not found');
-    }
-
-    createUserDto.password = await bcryptjs.hash(createUserDto.password, 10);
-
-    return {
-      message: 'user created successfully',
-      data: UserMapper(
-        await this.usersRepository.save({
-          ...createUserDto,
-          role: rolExists.id,
-        }),
-      ),
-    };
     
   }
 
@@ -153,24 +161,36 @@ export class UsersService {
       throw error;
     }
   }
-  async findOneByUserName(user_name: string, withPassword = false) {
+  async findOneByUserName(
+    user_name: string,
+    withPassword = false,
+    getRole = false,
+  ) {
+    const properties = [
+      'users.id',
+      'users.name',
+      'users.last_name',
+      'users.user_name',
+      'users.email',
+      'users.created_at',
+      'users.updated_at',
+    ];
+
+    if (withPassword) {
+      properties.push('users.password');
+    }
+
+    if (getRole) {
+      properties.push('roles.id');
+      properties.push('roles.name');
+    }
+
     return await this.usersRepository
-      .createQueryBuilder('user')
-      .leftJoinAndSelect('user.role', 'role') // Usamos leftJoinAndSelect para obtener automáticamente los datos relacionados
-      .select([
-        'user.id', // Lista explícita de columnas
-        'user.name',
-        'user.last_name',
-        'user.user_name',
-        'user.email',
-        'user.created_at',
-        'user.updated_at',
-        'role.id', // Selección de las columnas de la tabla roles
-        'role.name',
-        withPassword ? 'user.password' : '',
-      ])
-      .where('user.user_name = :user_name', { user_name })
-      .andWhere('user.deleted_at IS NULL')
+      .createQueryBuilder('users')
+      .leftJoinAndSelect('users.role', 'roles')
+      .select(properties)
+      .where('users.user_name = :user_name', { user_name })
+      .andWhere('users.deleted_at IS NULL')
       .getOne();
   }
 
@@ -202,9 +222,9 @@ export class UsersService {
         deleted_at: null,
       });
 
-      // if (!rolExists) {
-      //   throw new BadRequestException('Rol not found');
-      // }
+      if (!rolExists) {
+        throw new BadRequestException('Rol not found');
+      }
 
       const updatedUser = await this.usersRepository.save({
         ...user,
@@ -262,3 +282,4 @@ export class UsersService {
     };
   }
 }
+

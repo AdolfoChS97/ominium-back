@@ -42,7 +42,7 @@ export class ResourcesToPermissionsService {
             'rtp.resourceId AS resource',
             'resources.id',
             'resources.name',
-            'resources.route',
+            'resources.route AS route',
             'rtp.permissionId AS permission',
             'permissions.name',
             'permissions.execute',
@@ -57,7 +57,7 @@ export class ResourcesToPermissionsService {
         queryParams,
         trash,
       );
-      const rows = await (await query).getMany();
+      const rows = await (await query).getRawMany();
       return { rows: rows, total: rows.length };
     } catch (e) {
       errorHandler(e);

@@ -38,19 +38,18 @@ export class ResourcesToPermissionsService {
         await this.resourcesToPermissionsRepository
           .createQueryBuilder('rtp')
           .select([
-            'rtp.id',
-            'rtp.resourceId AS resource',
-            'resources.id',
-            'resources.name',
-            'resources.route AS route',
-            'rtp.permissionId AS permission',
-            'permissions.name',
-            'permissions.execute',
-            'permissions.read',
-            'permissions.write',
-            'rtp.created_at',
-            'rtp.updated_at',
-            'rtp.deleted_at',
+            'rtp.id AS rtp_id',
+            'rtp.created_at AS rtp_created_at',
+            'rtp.updated_at AS rtp_updated_at',
+            'rtp.deleted_at AS rtp_deleted_at',
+            'resources.id AS resource_id',
+            'resources.name resource_name',
+            'resources.route AS resource_route',
+            'permissions.id AS permission_id',
+            'permissions.name permission_name',
+            'permissions.execute AS permission_execute',
+            'permissions.read AS permission_read',
+            'permissions.write AS permission_write',
           ])
           .leftJoin('rtp.resourceId', 'resources')
           .leftJoin('rtp.permissionId', 'permissions'),

@@ -66,14 +66,12 @@ export class UsersService {
     try {
       const { user_name, email, role } = createUserDto;
 
-
-    
       if ((await this.userNameOrEmailExists(user_name, email)) !== null) {
         throw new BadRequestException('user name or email already exists');
       }
 
       const rolExists = await this.rolesRepository.findOneBy({
-        id: role,
+        name: role,
         deleted_at: null,
       });
 
@@ -83,7 +81,6 @@ export class UsersService {
 
       createUserDto.password = await bcryptjs.hash(createUserDto.password, 10);
 
-    
       return {
         message: 'user created successfully',
         data: UserMapper(
@@ -97,7 +94,6 @@ export class UsersService {
       throw e;
       errorHandler(e);
     }
-    
   }
 
   async findAll({ pageNumber, pageSize, sort }: PaginationQueryParamsDto) {
@@ -274,7 +270,6 @@ export class UsersService {
       throw new BadRequestException('user not found');
     }
 
-  
     await this.usersRepository.save({ ...user, deleted_at: new Date() });
 
     return {
@@ -282,4 +277,3 @@ export class UsersService {
     };
   }
 }
-

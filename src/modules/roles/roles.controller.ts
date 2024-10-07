@@ -34,12 +34,12 @@ export class RolesController {
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateRolDto: UpdateRolDto) {
-    return this.rolesService.update(+id, updateRolDto);
+    return this.rolesService.update(id, updateRolDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.rolesService.remove(+id);
+    return this.rolesService.remove(id);
   }
 
   @ApiParam({ name: 'Role id', required: true, type: String })

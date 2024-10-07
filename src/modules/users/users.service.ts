@@ -9,6 +9,7 @@ import * as bcryptjs from 'bcryptjs';
 import { PaginationQueryParamsDto } from 'src/shared/dtos/pagination.dto';
 import { Roles } from 'src/modules/roles/entities/roles.entity';
 import { UserMapper } from './mappers';
+import { errorHandler } from 'src/shared/utils/error-handler';
 
 @Injectable()
 export class UsersService {
@@ -65,12 +66,14 @@ export class UsersService {
     try {
       const { user_name, email, role } = createUserDto;
 
+
+    
       if ((await this.userNameOrEmailExists(user_name, email)) !== null) {
         throw new BadRequestException('user name or email already exists');
       }
 
       const rolExists = await this.rolesRepository.findOneBy({
-        name: role,
+        id: role,
         deleted_at: null,
       });
 
@@ -80,6 +83,7 @@ export class UsersService {
 
       createUserDto.password = await bcryptjs.hash(createUserDto.password, 10);
 
+    
       return {
         message: 'user created successfully',
         data: UserMapper(
@@ -90,8 +94,10 @@ export class UsersService {
         ),
       };
     } catch (e) {
-      handleError(e);
+      throw e;
+      errorHandler(e);
     }
+    
   }
 
   async findAll({ pageNumber, pageSize, sort }: PaginationQueryParamsDto) {
@@ -140,7 +146,7 @@ export class UsersService {
           'user.created_at',
           'user.updated_at',
           'roles.id',
-          'roles.rol',
+          'roles.name',
         ])
         .where('user.id = :id', { id })
         .andWhere('user.deleted_at IS NULL');
@@ -262,18 +268,18 @@ export class UsersService {
     }
   }
 
-  remove(id: string) {
-    const user = this.usersRepository.findOneBy({ id, deleted_at: null });
+  async remove(id: string) {
+    const user = await this.usersRepository.findOneBy({ id, deleted_at: null });
     if (!user) {
       throw new BadRequestException('user not found');
     }
-    this.usersRepository.save({ ...user, deleted_at: new Date() });
+
+  
+    await this.usersRepository.save({ ...user, deleted_at: new Date() });
 
     return {
       message: 'user deleted successfully',
     };
   }
 }
-function handleError(e: any) {
-  throw new Error('Function not implemented.');
-}
+

@@ -48,7 +48,7 @@ export class RolesService {
     return `This action returns a #${id} rol`;
   }
 
-  async update(id: number, updateRolDto: UpdateRolDto) {
+  async update(id: string, updateRolDto: UpdateRolDto) {
     try {
       const { rol } = updateRolDto;
       const rolExists = await this.rolesRepository.findOneBy({
@@ -69,13 +69,17 @@ export class RolesService {
         throw new BadRequestException('Rol already exists');
       }
 
-      return this.rolesRepository.save({ id, ...updateRolDto });
+      const rolUpdate = await this.rolesRepository.save({ id, ...updateRolDto });
+      return {
+        message: 'Rol updated successfully',
+        data : await rolUpdate
+      }
     } catch (error) {
       throw error;
     }
   }
 
-  remove(id: number) {
+  remove(id: string) {
     try {
       const rol = this.rolesRepository.findOneBy({ id, deleted_at: null });
       if (!rol) {

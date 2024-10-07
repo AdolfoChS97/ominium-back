@@ -1,40 +1,21 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { UsersModule } from './users/users.module';
+import { ConfigModule } from '@nestjs/config';
 import { DataSource } from 'typeorm';
-import { AuthModule } from './auth/auth.module';
-import { RolesModule } from './roles/roles.module';
-import { ResourcesModule } from './resources/resources.module';
-import { PermissionsModule } from './permissions/permissions.module';
-import { CondominiumsModule } from './condominiums/condominiums.module';
-
-const configService = new ConfigService();
+import { SeederModule } from './shared/modules/seeder.module';
+import { PostgresDatabaseProviderModule } from './shared/modules/postgres-database-provider.module';
+import { AuthModule } from './modules/auth/auth.module';
 
 @Module({
   imports: [
-    UsersModule,
     ConfigModule.forRoot({
       envFilePath: '.env',
       isGlobal: true,
     }),
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      host: configService.get('DB_HOST'),
-      port: configService.get('DB_PORT'),
-      username: configService.get('DB_USER'),
-      password: configService.get('DB_PASSWORD'),
-      database: configService.get('DB_NAME'),
-      autoLoadEntities: true,
-      synchronize: true,
-    }),
+    PostgresDatabaseProviderModule,
     AuthModule,
-    RolesModule,
-    ResourcesModule,
-    CondominiumsModule,
-    // PermissionsModule,
+    SeederModule,
   ],
   controllers: [AppController],
   providers: [AppService],

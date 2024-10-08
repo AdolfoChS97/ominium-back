@@ -6,6 +6,10 @@ import { Roles } from '../entities/roles.entity';
 import { Not, Repository } from 'typeorm';
 import { errorHandler } from 'src/shared/utils/error-handler';
 import { PermissionsService } from 'src/modules/permissions/services/permissions.service';
+import { Order, PaginationQueryParamsDto } from 'src/shared/dtos/pagination.dto';
+import { QueryDatesFiltersDto } from 'src/shared/dtos/query-date-filters.dto';
+import moment from 'moment';
+import { queryParamsHandler } from 'src/shared/utils/query-params-handler';
 
 @Injectable()
 export class RolesService {
@@ -32,13 +36,23 @@ export class RolesService {
     }
   }
 
-  findAll() {
+  async findAll(queryParams: PaginationQueryParamsDto & QueryDatesFiltersDto = {
+    pageNumber: 1,
+    pageSize: 10,
+    sort: 'DESC' as Order,
+    since: moment().format('DD-MM-YYYY'),
+    until: moment().add(1, 'd').format('DD-MM-YYYY'),
+    
+  }) {
     try {
-      const data = this.rolesRepository.find({
-        where: { deleted_at: null },
-      });
-
-      return data;
+      const query = queryParamsHandler(
+        await this.rolesRepository
+          .createQueryBuilder('roles')
+          .select(['roles.*']),
+        queryParams,
+      )
+      const rows = await (await query).getRawMany();
+      return { rows: rows, total: rows.length };
     } catch (error) {
       throw error;
     }
@@ -142,3 +156,7 @@ export class RolesService {
     }
   }
 }
+function andWhere(arg0: string) {
+  throw new Error('Function not implemented.');
+}
+

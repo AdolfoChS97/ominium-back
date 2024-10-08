@@ -14,7 +14,10 @@ import { IRole } from '../interfaces/role.interface';
 
 @Entity({ name: 'Roles' })
 export class Roles implements IRole {
-  @ApiProperty({ example: '3f5b002c-cf32-425c-a60d-2dad6c9f8b7c', description: 'Unique identifier' })
+  @ApiProperty({
+    example: '3f5b002c-cf32-425c-a60d-2dad6c9f8b7c',
+    description: 'Unique identifier',
+  })
   @PrimaryGeneratedColumn('uuid')
   id: string;
 

@@ -69,11 +69,14 @@ export class RolesService {
         throw new BadRequestException('Rol already exists');
       }
 
-      const rolUpdate = await this.rolesRepository.save({ id, ...updateRolDto });
+      const rolUpdate = await this.rolesRepository.save({
+        id,
+        ...updateRolDto,
+      });
       return {
         message: 'Rol updated successfully',
-        data : await rolUpdate
-      }
+        data: await rolUpdate,
+      };
     } catch (error) {
       throw error;
     }
@@ -109,13 +112,31 @@ export class RolesService {
   async assign(id: string, permissionId: string) {
     try {
       const r = await this.getOneBy('id', id);
-      const p = await this.getOneBy('id', permissionId);
+      const p = await this.permissionService.getOneBy('id', permissionId);
       if (!r || !p)
         throw new BadRequestException(
           'We couldnt find the role or permission you are trying to assign',
         );
 
-      
+      return await this.permissionService.addRole(p.id, r.id);
+    } catch (e) {
+      errorHandler(e);
+    }
+  }
+
+  async assignPermissionToRole(id: string, permissionId: string) {
+    try {
+      // const [p, r] = await (
+      //   await Promise.allSettled([
+      //     await this.permissionService.getOneBy('id', permissionId),
+      //     await this.getOneBy('id', id),
+      //   ])
+      // ).map((p: PromiseSettledResult<Awaited<any>>) => {
+      //   const { status } = p;
+      //   if (status === 'fulfilled') return p?.value;
+      //   return null;
+      // }, []);
+      console.log(id, permissionId);
     } catch (e) {
       errorHandler(e);
     }

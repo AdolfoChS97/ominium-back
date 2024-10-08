@@ -6,7 +6,6 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
-  JoinColumn,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
@@ -72,5 +71,5 @@ export class Permissions implements IPermission {
   resourcesToPermissions: ResourcesToPermissions[];
 
   @ManyToOne(() => Roles, (role) => role.permissions)
-  role: Roles;
+  role: Roles | string;
 }

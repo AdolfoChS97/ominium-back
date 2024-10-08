@@ -10,5 +10,6 @@ import { UsersModule } from 'src/modules/users/users.module';
   imports: [TypeOrmModule.forFeature([Roles]), PermissionsModule, UsersModule],
   controllers: [RolesController],
   providers: [RolesService],
+  exports: [RolesService],
 })
 export class RolesModule {}

@@ -6,14 +6,11 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
-  JoinTable,
-  ManyToMany,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Resources } from 'src/modules/resources/entities/resources.entity';
 import { Roles } from 'src/modules/roles/entities/roles.entity';
 import { IPermission } from '../interfaces/permission.interface';
 import { ResourcesToPermissions } from 'src/modules/resources/entities/resources-to-permissions.entity';
@@ -74,5 +71,5 @@ export class Permissions implements IPermission {
   resourcesToPermissions: ResourcesToPermissions[];
 
   @ManyToOne(() => Roles, (role) => role.permissions)
-  role: Roles;
+  role: Roles | string;
 }

@@ -1,8 +1,16 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import moment from 'moment';
 import { ResourcesToPermissions } from 'src/modules/resources/entities/resources-to-permissions.entity';
+import {
+  PaginationQueryParamsDto,
+  Order,
+} from 'src/shared/dtos/pagination.dto';
 import { errorHandler } from 'src/shared/utils/error-handler';
 import { Repository } from 'typeorm';
+import { PermissionsFiltersDto } from '../dtos/permission-filters.dto';
+import { queryParamsHandler } from 'src/shared/utils/query-params-handler';
+import { ResourcesToPermissionMapper } from '../mappers/resources-to-permission.mapper';
 
 @Injectable()
 export class ResourcesToPermissionsService {
@@ -10,6 +18,52 @@ export class ResourcesToPermissionsService {
     @InjectRepository(ResourcesToPermissions)
     private readonly resourcesToPermissionsRepository: Repository<ResourcesToPermissions>,
   ) {}
+
+  async findAll(
+    queryParams: PermissionsFiltersDto & PaginationQueryParamsDto = {
+      pageNumber: 1,
+      pageSize: 10,
+      sort: 'DESC' as Order,
+      since: moment().format('DD-MM-YYYY'),
+      until: moment().add(1, 'd').format('DD-MM-YYYY'),
+      name: null,
+      description: null,
+      execute: null,
+      read: null,
+      write: null,
+    },
+    trash: boolean = false,
+  ) {
+    try {
+      const query = queryParamsHandler(
+        await this.resourcesToPermissionsRepository
+          .createQueryBuilder('rtp')
+          .select([
+            'rtp.id AS rtp_id',
+            'rtp.created_at AS rtp_created_at',
+            'rtp.updated_at AS rtp_updated_at',
+            'rtp.deleted_at AS rtp_deleted_at',
+            'resources.id AS resource_id',
+            'resources.name resource_name',
+            'resources.route AS resource_route',
+            'permissions.id AS permission_id',
+            'permissions.name permission_name',
+            'permissions.execute AS permission_execute',
+            'permissions.read AS permission_read',
+            'permissions.write AS permission_write',
+          ])
+          .leftJoin('rtp.resourceId', 'resources')
+          .leftJoin('rtp.permissionId', 'permissions'),
+        queryParams,
+        trash,
+      );
+      return await ResourcesToPermissionMapper(
+        await (await query).getRawMany(),
+      );
+    } catch (e) {
+      errorHandler(e);
+    }
+  }
 
   async create(resourceId: string, permissionId: string) {
     try {

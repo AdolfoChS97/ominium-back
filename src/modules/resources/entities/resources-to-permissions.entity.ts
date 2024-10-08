@@ -3,9 +3,12 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { Resources } from './resources.entity';
+import { Permissions } from '../../permissions/entities/permissions.entity';
 
 @Entity({ name: 'Resources_to_Permissions' })
 export class ResourcesToPermissions {
@@ -14,19 +17,24 @@ export class ResourcesToPermissions {
 
   @Column({
     type: 'uuid',
-    name: 'resource_id',
+    name: 'resourceId',
     nullable: false,
     unique: false,
   })
-  resourceId: string;
+  @ManyToOne(() => Resources, (resource) => resource.resourcesToPermissions)
+  resourceId: Resources | string;
 
   @Column({
     type: 'uuid',
-    name: 'permission_id',
+    name: 'permissionId',
     nullable: false,
     unique: false,
   })
-  permissionId: string;
+  @ManyToOne(
+    () => Permissions,
+    (permission) => permission.resourcesToPermissions,
+  )
+  permissionId: Permissions | string;
 
   @CreateDateColumn({
     name: 'created_at',

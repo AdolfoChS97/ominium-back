@@ -17,8 +17,8 @@ import {
 } from 'src/shared/dtos/pagination.dto';
 import * as moment from 'moment';
 import { ResourcesService } from '../../resources/resources.service';
-import { queryParamsHandler } from 'src/shared/utils/query-params-handler';
 import { ResourcesToPermissionsService } from './resources-to-permissions.service';
+// import { RolesService } from 'src/modules/roles/services/roles.service';
 
 @Injectable()
 export class PermissionsService {
@@ -66,6 +66,19 @@ export class PermissionsService {
     }
   }
 
+  async addRole(id: string, roleId: string) {
+    try {
+      const updated = await this.permissionsRepository.save({
+        id: id,
+        role: roleId,
+        updated_at: new Date(),
+      });
+      return PermissionMapper(updated, 'Role added successfully');
+    } catch (e) {
+      errorHandler(e);
+    }
+  }
+
   async getOneBy(param: 'name' | 'id', value: string) {
     try {
       const p = await this.permissionsRepository
@@ -94,15 +107,13 @@ export class PermissionsService {
     trash: boolean = false,
   ) {
     try {
-      const query = queryParamsHandler(
-        await this.permissionsRepository
-          .createQueryBuilder('permissions')
-          .select(['permissions.*']),
+      const r = await this.resourcesToPermissionsService.findAll(
         queryParams,
         trash,
       );
-      const rows = await (await query).getRawMany();
-      return { rows: rows, total: rows.length };
+      return {
+        rows: { ...r },
+      };
     } catch (e) {
       errorHandler(e);
     }
@@ -203,7 +214,6 @@ export class PermissionsService {
           await this.resourcesService.getOneBy('id', resourceId),
         ])
       ).map((p: PromiseSettledResult<Awaited<any>>) => {
-        console.log(p);
         const { status } = p;
         if (status === 'fulfilled') return p?.value;
         return null;

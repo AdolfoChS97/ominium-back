@@ -94,44 +94,17 @@ export class PermissionsService {
     trash: boolean = false,
   ) {
     try {
-      return await this.resourcesToPermissionsService.findAll(
+      const r = await this.resourcesToPermissionsService.findAll(
         queryParams,
         trash,
       );
+      return {
+        rows: { ...r },
+      };
     } catch (e) {
       errorHandler(e);
     }
   }
-
-  // async getAll(
-  //   queryParams: PermissionsFiltersDto & PaginationQueryParamsDto = {
-  //     pageNumber: 1,
-  //     pageSize: 10,
-  //     sort: 'DESC' as Order,
-  //     since: moment().format('DD-MM-YYYY'),
-  //     until: moment().add(1, 'd').format('DD-MM-YYYY'),
-  //     name: null,
-  //     description: null,
-  //     execute: null,
-  //     read: null,
-  //     write: null,
-  //   },
-  //   trash: boolean = false,
-  // ) {
-  //   try {
-  //     const query = queryParamsHandler(
-  //       await this.permissionsRepository
-  //         .createQueryBuilder('permissions')
-  //         .select(['permissions.*']),
-  //       queryParams,
-  //       trash,
-  //     );
-  //     const rows = await (await query).getRawMany();
-  //     return { rows: rows, total: rows.length };
-  //   } catch (e) {
-  //     errorHandler(e);
-  //   }
-  // }
 
   async findOne(id: string) {
     try {

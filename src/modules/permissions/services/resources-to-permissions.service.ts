@@ -10,6 +10,8 @@ import { errorHandler } from 'src/shared/utils/error-handler';
 import { Repository } from 'typeorm';
 import { PermissionsFiltersDto } from '../dtos/permission-filters.dto';
 import { queryParamsHandler } from 'src/shared/utils/query-params-handler';
+import { ResourcesToPermissionMapper } from '../mappers/resources-to-permission.mapper';
+import { ResourcesToPermissionDto } from '../dtos/resources-to-permission.dto';
 
 @Injectable()
 export class ResourcesToPermissionsService {
@@ -32,7 +34,7 @@ export class ResourcesToPermissionsService {
       write: null,
     },
     trash: boolean = false,
-  ) {
+  ): Promise<Record<string, ResourcesToPermissionDto[]>[]> {
     try {
       const query = queryParamsHandler(
         await this.resourcesToPermissionsRepository
@@ -56,8 +58,9 @@ export class ResourcesToPermissionsService {
         queryParams,
         trash,
       );
-      const rows = await (await query).getRawMany();
-      return { rows: rows, total: rows.length };
+      return await ResourcesToPermissionMapper(
+        await (await query).getRawMany(),
+      );
     } catch (e) {
       errorHandler(e);
     }

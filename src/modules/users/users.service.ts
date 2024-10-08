@@ -101,6 +101,7 @@ export class UsersService {
       const query = this.usersRepository
         .createQueryBuilder('user')
         .leftJoinAndSelect('user.role', 'roles')
+        .leftJoinAndSelect('roles.permissions', 'permissions')
         .select([
           'user.id',
           'user.name',
@@ -111,6 +112,11 @@ export class UsersService {
           'user.updated_at',
           'roles.id',
           'roles.name',
+          'permissions.id',
+          'permissions.name',
+          'permissions.execute',
+          'permissions.read',
+          'permissions.write',
         ])
         .where('user.deleted_at IS NULL')
         .orderBy('user.created_at', sort || 'DESC')
